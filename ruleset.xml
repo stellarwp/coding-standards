@@ -129,21 +129,9 @@
 	<!-- The closing ?> tag MUST be omitted from files containing only PHP. -->
 	<rule ref="Zend.Files.ClosingTag"/>
 
-	<!-- Ensures filenames do not contain underscores -->
-	<rule ref="WordPress.Files.FileName"/>
-
-	<!-- Enforces WordPress function argument format -->
-	<rule ref="WordPress.Functions.FunctionDeclarationArgumentSpacing"/>
-
-	<!-- Checks that methods are named appropriately -->
-	<rule ref="WordPress.NamingConventions.ValidFunctionName"/>
-
 	<!-- Makes sure that any use of Double Quotes ("") are warranted. -->
 	<rule ref="Squiz.Strings.DoubleQuoteUsage"/>
 	<rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
 		<severity>0</severity>
 	</rule>
-
-	<!-- Test for escaping the way VIP does. -->
-	<rule ref="WordPress.XSS.EscapeOutput"/>
 </ruleset>

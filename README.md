@@ -9,5 +9,4 @@ The Modern Tribe coding standards uses a combination of:
 * PSR2 (part of PHP_CodeSniffer)
 * Squiz (part of PHP_CodeSniffer)
 * Zend (part of PHP_CodeSniffer)
-* [WordPress](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards)
-* Custom sniffs
+* Custom sniffs (a few based on [WordPress](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards))
