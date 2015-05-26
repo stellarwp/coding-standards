@@ -1,6 +1,6 @@
 <?php
 /**
- * ModernTribe_Sniffs_Methods_MethodDeclarationSniff.
+ * TribalScents_Sniffs_Methods_MethodDeclarationSniff.
  *
  * PHP version 5
  *
@@ -17,7 +17,7 @@ if (class_exists('PHP_CodeSniffer_Standards_AbstractScopeSniff', true) === false
 }
 
 /**
- * ModernTribe_Sniffs_Methods_MethodDeclarationSniff.
+ * TribalScents_Sniffs_Methods_MethodDeclarationSniff.
  *
  * Checks that the method declaration is correct.
  *
@@ -29,7 +29,7 @@ if (class_exists('PHP_CodeSniffer_Standards_AbstractScopeSniff', true) === false
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ModernTribe_Sniffs_Methods_MethodDeclarationSniff extends PHP_CodeSniffer_Standards_AbstractScopeSniff
+class TribalScents_Sniffs_Methods_MethodDeclarationSniff extends PHP_CodeSniffer_Standards_AbstractScopeSniff
 {
     /**
      * Constructs a Squiz_Sniffs_Scope_MethodScopeSniff.

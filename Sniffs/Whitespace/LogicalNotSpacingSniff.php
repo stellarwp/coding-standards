@@ -12,7 +12,7 @@
  */
 
 /**
- * ModernTribe_Sniffs_WhiteSpace_LogicalNotSpacingSniff.
+ * TribalScents_Sniffs_WhiteSpace_LogicalNotSpacingSniff.
  *
  * @category  PHP
  * @package   PHP_CodeSniffer
@@ -20,7 +20,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  */
-class ModernTribe_Sniffs_WhiteSpace_LogicalNotSpacingSniff implements PHP_CodeSniffer_Sniff
+class TribalScents_Sniffs_WhiteSpace_LogicalNotSpacingSniff implements PHP_CodeSniffer_Sniff
 {
 	/**
 	 * A list of tokenizers this sniff supports.

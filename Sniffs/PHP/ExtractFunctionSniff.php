@@ -1,6 +1,6 @@
 <?php
 /**
- * ModernTribe_Sniffs_PHP_ExtractFunctionSniff
+ * TribalScents_Sniffs_PHP_ExtractFunctionSniff
  *
  * Throw an error if extract is used
  *
@@ -9,11 +9,11 @@
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @copyright 2012 ModernTribe
- * @license   https://github.com/ModernTribe/ModernTribe-codesniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ModernTribe_Sniffs_PHP_ExtractFunctionSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff
+class TribalScents_Sniffs_PHP_ExtractFunctionSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff
 {
 	/**
 	 * A list of forbidden functions with their alternatives.

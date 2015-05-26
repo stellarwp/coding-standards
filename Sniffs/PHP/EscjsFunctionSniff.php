@@ -1,6 +1,6 @@
 <?php
 /**
- * ModernTribe_Sniffs_PHP_EscjsFunctionSniff
+ * TribalScents_Sniffs_PHP_EscjsFunctionSniff
  *
  * Throw an error if esc_js is used
  *
@@ -10,11 +10,11 @@
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @author    Stephen Page <stephenjpage@gmail.com>
  * @copyright 2012 ModernTribe
- * @license   https://github.com/ModernTribe/ModernTribe-codesniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ModernTribe_Sniffs_PHP_EscjsFunctionSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff
+class TribalScents_Sniffs_PHP_EscjsFunctionSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff
 {
 	/**
 	 * A list of forbidden functions with their alternatives.

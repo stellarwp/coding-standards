@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="tribal-scents">
+<ruleset name="TribalScents">
 	<description>Modern Tribe coding standards.</description>
 	<exclude-pattern>*/.git/*</exclude-pattern>
 	<exclude-pattern>*/.svn/*</exclude-pattern>

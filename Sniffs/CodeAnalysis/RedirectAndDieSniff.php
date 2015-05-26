@@ -1,6 +1,6 @@
 <?php
 /**
- * ModernTribe_Sniffs_CodeAnalysis_RedirectAndDieSniff
+ * TribalScents_Sniffs_CodeAnalysis_RedirectAndDieSniff
  *
  * Throw an error if error loggins functions are in use
  *
@@ -8,11 +8,11 @@
  * @package   PHP_CodeSniffer
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @copyright 2014 ModernTribe
- * @license   https://github.com/ModernTribe/ModernTribe-codesniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ModernTribe_Sniffs_CodeAnalysis_RedirectAndDieSniff implements PHP_CodeSniffer_Sniff
+class TribalScents_Sniffs_CodeAnalysis_RedirectAndDieSniff implements PHP_CodeSniffer_Sniff
 {
 	/**
 	 * A list of tokenizers this sniff supports.

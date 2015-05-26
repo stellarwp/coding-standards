@@ -12,7 +12,7 @@
  */
 
 /**
- * ModernTribe_Sniffs_WhiteSpace_ControlStructureSpacingSniff.
+ * TribalScents_Sniffs_WhiteSpace_ControlStructureSpacingSniff.
  *
  * Checks that any array declarations are lower case.
  *
@@ -22,7 +22,7 @@
  * @author   Greg Sherwood <gsherwood@squiz.net>
  * @author   Marc McIntyre <mmcintyre@squiz.net>
  */
-class ModernTribe_Sniffs_Whitespace_ControlStructureSpacingSniff implements PHP_CodeSniffer_Sniff
+class TribalScents_Sniffs_Whitespace_ControlStructureSpacingSniff implements PHP_CodeSniffer_Sniff
 {
 	/**
 	 * A list of tokenizers this sniff supports.

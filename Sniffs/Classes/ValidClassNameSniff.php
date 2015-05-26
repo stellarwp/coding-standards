@@ -15,7 +15,7 @@
  */
 
 /**
- * ModernTribe_Sniffs_Classes_ValidClassNameSniff.
+ * TribalScents_Sniffs_Classes_ValidClassNameSniff.
  *
  * Ensures classes are in camel caps, and the first letter is capitalised
  *
@@ -28,7 +28,7 @@
  * @version   Release: 1.2.0RC1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ModernTribe_Sniffs_Classes_ValidClassNameSniff implements PHP_CodeSniffer_Sniff
+class TribalScents_Sniffs_Classes_ValidClassNameSniff implements PHP_CodeSniffer_Sniff
 {
 	/**
 	 * Returns an array of tokens this test wants to listen for.

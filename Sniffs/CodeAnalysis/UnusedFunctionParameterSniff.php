@@ -1,6 +1,6 @@
 <?php
 /**
- * ModernTribe_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff
+ * TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff
  *
  * This is a shameless copy of the work done by Squizlabs, specifically
  * Greg Sherwood <gsherwood@squiz.net> and Marc McIntyre <mmcintyre@squiz.net>,
@@ -13,7 +13,7 @@
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @copyright 2012 ModernTribe
- * @license   https://github.com/ModernTribe/ModernTribe-codesniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -31,11 +31,11 @@
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @copyright 2012 ModernTribe
- * @license   https://github.com/ModernTribe/ModernTribe-codesniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class ModernTribe_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements PHP_CodeSniffer_Sniff
+class TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements PHP_CodeSniffer_Sniff
 {
 	/**
 	 * Returns an array of tokens this test wants to listen for.
