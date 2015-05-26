@@ -1,4 +1,4 @@
-moderntribe-codesniffer
+Tribal Scents
 ==================
 
 Modern Tribe standards for PHP CodeSniffer
