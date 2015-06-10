@@ -91,28 +91,6 @@ class TribalScents_Sniffs_Whitespace_ControlStructureSpacingSniff implements PHP
 			}
 		}//end if
 
-		$firstContent = $phpcsFile->findNext( T_WHITESPACE, ( $scopeOpener + 1 ), null, true );
-		if ( $tokens[ $firstContent ]['line'] !== ( $tokens[ $scopeOpener ]['line'] + 1 ) && $tokens[ $firstContent ]['code'] !== T_CLOSE_TAG )
-		{
-			$error = 'Blank line found at start of control structure';
-			$phpcsFile->addError( $error, $scopeOpener );
-		}//end if
-
-		$lastContent = $phpcsFile->findPrevious( T_WHITESPACE, ( $scopeCloser - 1 ), null, true );
-		if ( $tokens[ $lastContent ]['line'] !== ( $tokens[ $scopeCloser ]['line'] - 1 ) )
-		{
-			$errorToken = $scopeCloser;
-			for ( $i = ( $scopeCloser - 1 ); $i > $lastContent; $i-- )
-			{
-				if ( $tokens[ $i ]['line'] < $tokens[ $scopeCloser ]['line'] && $tokens[ $firstContent ]['code'] !== T_OPEN_TAG )
-				{
-					$error = 'Blank line found at end of control structure';
-					$phpcsFile->addError( $error, $i );
-					break;
-				}//end if
-			}//end for
-		}//end if
-
 		$trailingContent = $phpcsFile->findNext( T_WHITESPACE, ( $scopeCloser + 1 ), null, true );
 		if ( $tokens[ $trailingContent ]['code'] === T_ELSE )
 		{
