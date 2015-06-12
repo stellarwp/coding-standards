@@ -24,7 +24,7 @@ class TribalScents_Sniffs_PHP_EscjsFunctionSniff extends Generic_Sniffs_PHP_Forb
 	 *
 	 * @var array(string => string|null)
 	 */
-	protected $forbiddenFunctions = array(
+	public $forbiddenFunctions = array(
 		'esc_js' => 'json_encode',
 	);
 

@@ -43,7 +43,7 @@ class TribalScents_Sniffs_PHP_DeprecatedFunctionsSniff extends Generic_Sniffs_PH
      *
      * @var array(string => string|null)
      */
-		protected $forbiddenFunctions = array(
+		public $forbiddenFunctions = array(
 			"get_postdata"                          => "get_post()",
 			"start_wp"                              => "The Loop - {@link http://codex.wordpress.org/The_Loop Use new WordPress Loop}",
 			"the_category_ID"                       => "get_the_category()",

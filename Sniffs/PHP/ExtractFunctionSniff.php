@@ -23,7 +23,7 @@ class TribalScents_Sniffs_PHP_ExtractFunctionSniff extends Generic_Sniffs_PHP_Fo
 	 *
 	 * @var array(string => string|null)
 	 */
-	protected $forbiddenFunctions = array(
+	public $forbiddenFunctions = array(
 		'extract' => 'separate assignments or access the array directly',
 	);
 
