@@ -19,7 +19,7 @@
  * @author   Weston Ruter <weston@x-team.com>
  * @link     http://codex.wordpress.org/Data_Validation Data Validation on WordPress Codex
  */
-class TribalScents_Sniffs_XSS_EscapeOutputSniff extends WordPress_Sniff
+class TribalScents_Sniffs_XSS_EscapeOutputSniff extends TribalScents_Sniff
 {
 
 	/**
@@ -108,12 +108,12 @@ class TribalScents_Sniffs_XSS_EscapeOutputSniff extends WordPress_Sniff
 	{
 		// Merge any custom functions with the defaults, if we haven't already.
 		if ( ! self::$addedCustomFunctions ) {
-			WordPress_Sniff::$escapingFunctions = array_merge( WordPress_Sniff::$escapingFunctions, array_flip( $this->customEscapingFunctions ) );
-			WordPress_Sniff::$autoEscapedFunctions = array_merge( WordPress_Sniff::$autoEscapedFunctions, array_flip( $this->customAutoEscapedFunctions ) );
-			WordPress_Sniff::$printingFunctions = array_merge( WordPress_Sniff::$printingFunctions, array_flip( $this->customPrintingFunctions ) );
+			TribalScents_Sniff::$escapingFunctions = array_merge( TribalScents_Sniff::$escapingFunctions, array_flip( $this->customEscapingFunctions ) );
+			TribalScents_Sniff::$autoEscapedFunctions = array_merge( TribalScents_Sniff::$autoEscapedFunctions, array_flip( $this->customAutoEscapedFunctions ) );
+			TribalScents_Sniff::$printingFunctions = array_merge( TribalScents_Sniff::$printingFunctions, array_flip( $this->customPrintingFunctions ) );
 
 			if ( ! empty( $this->customSanitizingFunctions ) ) {
-				WordPress_Sniff::$escapingFunctions = array_merge( WordPress_Sniff::$escapingFunctions, array_flip( $this->customSanitizingFunctions ) );
+				TribalScents_Sniff::$escapingFunctions = array_merge( TribalScents_Sniff::$escapingFunctions, array_flip( $this->customSanitizingFunctions ) );
 				$phpcsFile->addWarning( 'The customSanitizingFunctions property is deprecated in favor of customEscapingFunctions.', 0, 'DeprecatedCustomSanitizingFunctions' );
 			}
 
