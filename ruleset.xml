@@ -71,6 +71,12 @@
 	<!-- Discourages the use of alias functions that are kept in PHP for compatibility with older versions. Can be used to forbid the use of any function. -->
 	<rule ref="Generic.PHP.ForbiddenFunctions"/>
 
+	<!-- PHP keywords MUST be in lower case -->
+	<rule ref="Generic.PHP.LowerCaseKeyword"/>
+
+	<!-- The PHP constants true, false, and null MUST be in lower case. -->
+	<rule ref="Generic.PHP.LowerCaseConstant"/>
+
 	<!-- Checks that two strings are not concatenated together; suggests using one string instead. -->
 	<rule ref="Generic.Strings.UnnecessaryStringConcat"/>
 
