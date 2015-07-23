@@ -140,4 +140,8 @@
 	<rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
 		<severity>0</severity>
 	</rule>
+
+	<rule ref="TribalScents.Arrays.ArrayDeclaration">
+		<exclude name="TribalScents.Arrays.ArrayDeclaration.SingleLineNotAllowed" />
+	</rule>
 </ruleset>
