@@ -151,7 +151,7 @@ class TribalScents_Sniffs_XSS_EscapeOutputSniff extends TribalScents_Sniff
 		}
 
 		if ( isset( $end_of_statement, self::$unsafePrintingFunctions[ $function ] ) ) {
-			$error = $phpcsFile->addError( "Expected next thing to be an escaping function (like %s), not '%s'", $stackPtr, 'UnsafePrintingFunction', array( self::$unsafePrintingFunctions[ $function ], $function ) );
+			$error = $phpcsFile->addWarning( "Expected next thing to be an escaping function (like %s), not '%s'", $stackPtr, 'UnsafePrintingFunction', array( self::$unsafePrintingFunctions[ $function ], $function ) );
 
 			// If the error was reported, don't bother checking the function's arguments.
 			if ( $error ) {
@@ -310,7 +310,7 @@ class TribalScents_Sniffs_XSS_EscapeOutputSniff extends TribalScents_Sniff
 				}
 			}
 
-			$this->phpcsFile->addError(
+			$this->phpcsFile->addWarning(
 				"Expected next thing to be an escaping function (see Codex for 'Data Validation'), not '%s'",
 				$i,
 				'OutputNotEscaped',
