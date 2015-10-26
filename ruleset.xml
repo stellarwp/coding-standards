@@ -131,6 +131,9 @@
 	<!-- Visibility MUST be declared on all methods. -->
 	<rule ref="Squiz.Scope.MethodScope"/>
 	<rule ref="Squiz.WhiteSpace.ScopeKeywordSpacing"/>
+	
+	<!-- Checks for usage of "$this" in static methods, which will cause runtime errors. -->
+	<rule ref="Squiz.Scope.StaticThisUsage"/>
 
 	<!-- The closing ?> tag MUST be omitted from files containing only PHP. -->
 	<rule ref="Zend.Files.ClosingTag"/>
