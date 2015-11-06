@@ -89,6 +89,12 @@ class TribalScents_Sniffs_Whitespace_ControlStructureSpacingSniff implements PHP
 				$error = 'No space before closing parenthesis is prohibited';
 				$phpcsFile->addError( $error, $closer );
 			}
+
+			if ( $tokens[ ( $closer + 1 ) ]['code'] !== T_WHITESPACE )
+			{
+				$error = 'You must have a space after a closing parenthesis';
+				$phpcsFile->addError( $error, $closer );
+			}
 		}//end if
 
 		$trailingContent = $phpcsFile->findNext( T_WHITESPACE, ( $scopeCloser + 1 ), null, true );
