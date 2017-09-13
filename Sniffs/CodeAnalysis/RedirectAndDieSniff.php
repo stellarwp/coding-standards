@@ -73,7 +73,7 @@ class TribalScents_Sniffs_CodeAnalysis_RedirectAndDieSniff implements PHP_CodeSn
 		$semicolon = $phpcsFile->findNext( T_SEMICOLON, $stackPtr );
 		$next = $tokens[ $phpcsFile->findNext( T_WHITESPACE, $semicolon + 1, NULL, TRUE ) ];
 
-		if ( T_EXIT == $next['code'] )
+		if ( T_EXIT == $next['code'] || 'tribe_exit' == $next['code'] )
 		{
 			return;
 		}//end if
