@@ -139,7 +139,7 @@ class OperatorSpacingSniff implements Sniff
 			if ( $tokens[ ( $stackPtr - 1 ) ][ 'code' ] !== T_WHITESPACE )
 			{
 				$error = "Expected 1 space before \"$operator\"; 0 found";
-				$phpcsFile->addError( $error, $stackPtr );
+				$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 			}//end if
 			elseif ( strlen( $tokens[ ( $stackPtr - 1 ) ][ 'content' ] ) !== 1 && "\t" !== substr( $tokens[ ( $stackPtr - 1 ) ][ 'content' ], -1 ) )
 			{
@@ -149,7 +149,7 @@ class OperatorSpacingSniff implements Sniff
 				{
 					$found = strlen( $tokens[ ( $stackPtr - 1 ) ][ 'content' ] );
 					$error = "Expected 1 space before \"$operator\"; $found found";
-					$phpcsFile->addError( $error, $stackPtr );
+					$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 				}//end if
 			}//end elseif
 
@@ -158,13 +158,13 @@ class OperatorSpacingSniff implements Sniff
 				if ( $tokens[ ( $stackPtr + 1 ) ][ 'code' ] !== T_WHITESPACE )
 				{
 					$error = "Expected 1 space after \"$operator\"; 0 found";
-					$phpcsFile->addError( $error, $stackPtr );
+					$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 				}//end if
 				elseif ( strlen( $tokens[ ( $stackPtr + 1 ) ][ 'content' ] ) !== 1 )
 				{
 					$found = strlen( $tokens[ ( $stackPtr + 1 ) ][ 'content' ] );
 					$error = "Expected 1 space after \"$operator\"; $found found";
-					$phpcsFile->addError( $error, $stackPtr );
+					$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 				}//end elseif
 			}//end if
 		}//end if

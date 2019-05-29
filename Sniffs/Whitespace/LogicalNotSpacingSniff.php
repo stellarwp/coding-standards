@@ -70,6 +70,6 @@ class LogicalNotSpacingSniff implements Sniff
 			return;
 		}//end if
 
-		$phpcsFile->addError( '! must be followed by a single space', $stackPtr );
+		$phpcsFile->addError( '! must be followed by a single space', $stackPtr, 'invalidWhitespace' );
 	}//end process
 }//end class

@@ -84,7 +84,7 @@ class ControlStructureSpacingSniff implements Sniff
 		{
 			// Checking this: $value = my_function([*]...).
 			$error = 'No space after opening parenthesis is prohibited';
-			$phpcsFile->addError( $error, $stackPtr );
+			$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 		}
 
 		if ( isset( $tokens[ $openBracket ]['parenthesis_closer'] ) === true )
@@ -94,13 +94,13 @@ class ControlStructureSpacingSniff implements Sniff
 			if ( $tokens[ ( $closer - 1 ) ]['code'] !== T_WHITESPACE )
 			{
 				$error = 'No space before closing parenthesis is prohibited';
-				$phpcsFile->addError( $error, $closer );
+				$phpcsFile->addError( $error, $closer, 'invalidWhitespace' );
 			}
 
 			if ( $tokens[ ( $closer + 1 ) ]['code'] !== T_WHITESPACE )
 			{
 				$error = 'You must have a space after a closing parenthesis';
-				$phpcsFile->addError( $error, $closer );
+				$phpcsFile->addError( $error, $closer, 'invalidWhitespace' );
 			}
 		}//end if
 
@@ -164,7 +164,7 @@ class ControlStructureSpacingSniff implements Sniff
 			if ( $tokens[ $trailingContent ]['line'] !== ( $tokens[ $scopeCloser ]['line'] + 1 ) )
 			{
 				$error = 'Blank line found after control structure';
-				$phpcsFile->addError( $error, $scopeCloser );
+				$phpcsFile->addError( $error, $scopeCloser, 'invalidWhitespace' );
 			}//end if
 		}//end if
 	}//end process

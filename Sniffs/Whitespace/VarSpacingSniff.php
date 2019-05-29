@@ -88,7 +88,7 @@ class VarSpacingSniff implements Sniff
 			if ( ' ' != $tokens[ $stackPtr + 1 ]['content'] )
 			{
 				$error = "There must be a space between {$token['content']} and the first parenthesis '('";
-				$phpcsFile->addError( $error, $stackPtr );
+				$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 			}//end if
 		}//end if
 
@@ -103,7 +103,7 @@ class VarSpacingSniff implements Sniff
 			)
 			{
 				$error = 'There must be a single space after the first parenthesis';
-				$phpcsFile->addError( $error, $token['parenthesis_opener'] );
+				$phpcsFile->addError( $error, $token['parenthesis_opener'], 'invalidWhitespace' );
 			}//end if
 
 			if (
@@ -112,7 +112,7 @@ class VarSpacingSniff implements Sniff
 			)
 			{
 				$error = 'There must be a single space before the last parenthesis';
-				$phpcsFile->addError( $error, $stackPtr );
+				$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 			}//end if
 		}//end if
 		else
@@ -128,7 +128,7 @@ class VarSpacingSniff implements Sniff
 			)
 			{
 				$error = 'There must be a single space after the first square bracket';
-				$phpcsFile->addError( $error, $stackPtr );
+				$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 			}//end if
 
 			if (
@@ -139,7 +139,7 @@ class VarSpacingSniff implements Sniff
 			)
 			{
 				$error = 'There must be a single space before the last square bracket';
-				$phpcsFile->addError( $error, $stackPtr );
+				$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 			}//end if
 		}//end else
 	}//end process
