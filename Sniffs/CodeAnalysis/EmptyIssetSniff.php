@@ -29,7 +29,6 @@ class TribalScents_Sniffs_CodeAnalysis_EmptyIssetSniff implements PHP_CodeSniffe
 	public function register() {
 		return array(
 			T_ISSET,
-			T_EMPTY,
 		);
 	}//end register()
 
@@ -55,6 +54,6 @@ class TribalScents_Sniffs_CodeAnalysis_EmptyIssetSniff implements PHP_CodeSniffe
 			return;
 		}
 
-		$phpcsFile->addError( 'empty() and isset() must only contain variables (PHP 5.2 compatibility)', $stackPtr, 'Error', 'NonVarEmpty' );
+		$phpcsFile->addError( 'isset() must only contain variables (PHP 5.6 compatibility)', $stackPtr, 'Error', 'NonVarEmpty' );
 	}//end process()
 }//end class
