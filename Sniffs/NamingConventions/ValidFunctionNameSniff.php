@@ -1,4 +1,11 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\NamingConventions;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * Enforces WordPress function name format, based upon Squiz code
  *
@@ -18,7 +25,7 @@
  * @package  PHP_CodeSniffer
  * @author   John Godley <john@urbangiraffe.com>
  */
-class TribalScents_Sniffs_NamingConventions_ValidFunctionNameSniff extends PHP_CodeSniffer_Standards_AbstractScopeSniff
+class ValidFunctionNameSniff extends Sniffs\AbstractScopeSniff
 {
 
     private $_magicMethods = array(
@@ -55,14 +62,14 @@ class TribalScents_Sniffs_NamingConventions_ValidFunctionNameSniff extends PHP_C
     /**
      * Processes the tokens within the scope.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being processed.
-     * @param int                  $stackPtr  The position where this token was
-     *                                        found.
-     * @param int                  $currScope The position of the current scope.
+     * @param File $phpcsFile The file being processed.
+     * @param int  $stackPtr  The position where this token was
+     *                        found.
+     * @param int  $currScope The position of the current scope.
      *
      * @return void
      */
-    protected function processTokenWithinScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $currScope) {
+    protected function processTokenWithinScope(File $phpcsFile, $stackPtr, $currScope) {
         $className  = $phpcsFile->getDeclarationName($currScope);
         $methodName = $phpcsFile->getDeclarationName($stackPtr);
 
@@ -91,13 +98,13 @@ class TribalScents_Sniffs_NamingConventions_ValidFunctionNameSniff extends PHP_C
     /**
      * Processes the tokens outside the scope.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file being processed.
-     * @param int                  $stackPtr  The position where this token was
-     *                                        found.
+     * @param File $phpcsFile The file being processed.
+     * @param int  $stackPtr  The position where this token was
+     *                        found.
      *
      * @return void
      */
-    protected function processTokenOutsideScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processTokenOutsideScope(File $phpcsFile, $stackPtr)
     {
         $functionName = $phpcsFile->getDeclarationName($stackPtr);
         if ($functionName === null) {

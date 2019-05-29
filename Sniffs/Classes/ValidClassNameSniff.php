@@ -1,4 +1,11 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\Classes;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * Modified Squiz_Sniffs_Classes_ValidClassNameSniff.
  *
@@ -28,7 +35,7 @@
  * @version   Release: 1.2.0RC1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class TribalScents_Sniffs_Classes_ValidClassNameSniff implements PHP_CodeSniffer_Sniff
+class ValidClassNameSniff implements Sniff
 {
 	/**
 	 * Returns an array of tokens this test wants to listen for.
@@ -46,13 +53,13 @@ class TribalScents_Sniffs_Classes_ValidClassNameSniff implements PHP_CodeSniffer
 	/**
 	 * Processes this test, when one of its tokens is encountered.
 	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The current file being processed.
-	 * @param int                  $stackPtr  The position of the current token in the
-	 *                                        stack passed in $tokens.
+	 * @param File $phpcsFile The current file being processed.
+	 * @param int  $stackPtr  The position of the current token in the
+	 *                        stack passed in $tokens.
 	 *
 	 * @return void
 	 */
-	public function process( PHP_CodeSniffer_File $phpcsFile, $stackPtr )
+	public function process( File $phpcsFile, $stackPtr )
 	{
 		$tokens = $phpcsFile->getTokens();
 

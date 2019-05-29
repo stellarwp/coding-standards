@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Represents a PHP_CodeSniffer sniff for sniffing WordPress coding standards.
  *
@@ -8,6 +7,13 @@
  * @category  PHP
  * @package   PHP_CodeSniffer
  */
+
+namespace PHP_CodeSniffer\Standards\TribalScents;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff as CS_Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * Represents a PHP_CodeSniffer sniff for sniffing TribalScents coding standards.
@@ -20,7 +26,7 @@
  * @version   0.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
+abstract class Sniff implements CS_Sniff {
 
 	/**
 	 * List of the functions which verify nonces.
@@ -323,7 +329,7 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 	 *
 	 * @since 0.4.0
 	 *
-	 * @var PHP_CodeSniffer_File
+	 * @var File
 	 */
 	protected $phpcsFile;
 
@@ -353,9 +359,9 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 	 *
 	 * @since 0.4.0
 	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The file currently being processed.
+	 * @param File $phpcsFile The file currently being processed.
 	 */
-	protected function init( PHP_CodeSniffer_File $phpcsFile ) {
+	protected function init( File $phpcsFile ) {
 		$this->phpcsFile = $phpcsFile;
 		$this->tokens = $phpcsFile->getTokens();
 	}
@@ -469,7 +475,7 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 		}
 
 		$next_non_empty = $this->phpcsFile->findNext(
-			PHP_CodeSniffer_Tokens::$emptyTokens
+			Tokens::$emptyTokens
 			, $stackPtr + 1
 			, null
 			, true
@@ -483,7 +489,7 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 		}
 
 		// If the next token is an assignment, that's all we need to know.
-		if ( in_array( $tokens[ $next_non_empty ]['code'], PHP_CodeSniffer_Tokens::$assignmentTokens ) ) {
+		if ( in_array( $tokens[ $next_non_empty ]['code'], Tokens::$assignmentTokens ) ) {
 			return true;
 		}
 
@@ -658,7 +664,7 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 
 		// Get the last non-empty token.
 		$prev = $this->phpcsFile->findPrevious(
-			PHP_CodeSniffer_Tokens::$emptyTokens
+			Tokens::$emptyTokens
 			, $stackPtr - 1
 			, null
 			, true
@@ -715,7 +721,7 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 
 			// Get the first parameter (name of function being used on the array).
 			$mapped_function = $this->phpcsFile->findNext(
-				PHP_CodeSniffer_Tokens::$emptyTokens
+				Tokens::$emptyTokens
 				, $function_opener + 1
 				, $function_closer
 				, true
@@ -746,7 +752,7 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 
 		// Find the next non-empty token.
 		$open_bracket = $this->phpcsFile->findNext(
-			PHP_CodeSniffer_Tokens::$emptyTokens,
+			Tokens::$emptyTokens,
 			$stackPtr + 1,
 			null,
 			true
@@ -907,19 +913,19 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 		// Find the previous non-empty token. We check before the var first because
 		// yoda conditions are usually expected.
 		$previous_token = $this->phpcsFile->findPrevious(
-			PHP_CodeSniffer_Tokens::$emptyTokens,
+			Tokens::$emptyTokens,
 			$stackPtr - 1,
 			null,
 			true
 		);
 
-		if ( in_array( $this->tokens[ $previous_token ]['code'], PHP_CodeSniffer_Tokens::$comparisonTokens ) ) {
+		if ( in_array( $this->tokens[ $previous_token ]['code'], Tokens::$comparisonTokens ) ) {
 			return true;
 		}
 
 		// Maybe the comparison operator is after this.
 		$next_token = $this->phpcsFile->findNext(
-			PHP_CodeSniffer_Tokens::$emptyTokens,
+			Tokens::$emptyTokens,
 			$stackPtr + 1,
 			null,
 			true
@@ -929,14 +935,14 @@ abstract class TribalScents_Sniff implements PHP_CodeSniffer_Sniff {
 		while ( T_OPEN_SQUARE_BRACKET === $this->tokens[ $next_token ]['code'] ) {
 
 			$next_token = $this->phpcsFile->findNext(
-				PHP_CodeSniffer_Tokens::$emptyTokens,
+				Tokens::$emptyTokens,
 				$this->tokens[ $next_token ]['bracket_closer'] + 1,
 				null,
 				true
 			);
 		}
 
-		if ( in_array( $this->tokens[ $next_token ]['code'], PHP_CodeSniffer_Tokens::$comparisonTokens ) ) {
+		if ( in_array( $this->tokens[ $next_token ]['code'], Tokens::$comparisonTokens ) ) {
 			return true;
 		}
 

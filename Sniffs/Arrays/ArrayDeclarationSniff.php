@@ -1,4 +1,12 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\Arrays;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+use PHP_CodeSniffer\Standards\Squiz\Sniffs\Arrays;
+
 /**
  * Enforces WordPress array format, based upon Squiz code
  *
@@ -20,12 +28,12 @@
  * @author   Greg Sherwood <gsherwood@squiz.net>
  * @author   Marc McIntyre <mmcintyre@squiz.net>
  */
-class TribalScents_Sniffs_Arrays_ArrayDeclarationSniff extends Squiz_Sniffs_Arrays_ArrayDeclarationSniff {
+class ArrayDeclarationSniff extends Arrays\ArrayDeclarationSniff {
 
 	/**
 	 * @since 0.5.0
 	 */
-	public function processSingleLineArray( PHP_CodeSniffer_File $phpcsFile, $stackPtr, $arrayStart, $arrayEnd ) {
+	public function processSingleLineArray( $phpcsFile, $stackPtr, $arrayStart, $arrayEnd ) {
 
 		parent::processSingleLineArray( $phpcsFile, $stackPtr, $arrayStart, $arrayEnd );
 
@@ -88,7 +96,7 @@ class TribalScents_Sniffs_Arrays_ArrayDeclarationSniff extends Squiz_Sniffs_Arra
 	/**
 	 * @since 0.5.0
 	 */
-	public function processMultiLineArray( PHP_CodeSniffer_File $phpcsFile, $stackPtr, $arrayStart, $arrayEnd ) {
+	public function processMultiLineArray( $phpcsFile, $stackPtr, $arrayStart, $arrayEnd ) {
 		$tokens       = $phpcsFile->getTokens();
 		$keywordStart = $tokens[$stackPtr]['column'];
 
@@ -230,7 +238,7 @@ class TribalScents_Sniffs_Arrays_ArrayDeclarationSniff extends Squiz_Sniffs_Arra
 					}
 
 					$valueContent = $phpcsFile->findNext(
-						PHP_CodeSniffer_Tokens::$emptyTokens,
+						Tokens::$emptyTokens,
 						($lastToken + 1),
 						$nextToken,
 						true
@@ -268,7 +276,7 @@ class TribalScents_Sniffs_Arrays_ArrayDeclarationSniff extends Squiz_Sniffs_Arra
 
 				// Find the value of this index.
 				$nextContent = $phpcsFile->findNext(
-					PHP_CodeSniffer_Tokens::$emptyTokens,
+					Tokens::$emptyTokens,
 					($nextToken + 1),
 					$arrayEnd,
 					true
@@ -287,7 +295,7 @@ class TribalScents_Sniffs_Arrays_ArrayDeclarationSniff extends Squiz_Sniffs_Arra
 			$singleValue = true;
 		} else if (count($indices) === 1 && $tokens[$lastToken]['code'] === T_COMMA) {
 			// There may be another array value without a comma.
-			$exclude     = PHP_CodeSniffer_Tokens::$emptyTokens;
+			$exclude     = Tokens::$emptyTokens;
 			$exclude[]   = T_COMMA;
 			$nextContent = $phpcsFile->findNext($exclude, ($indices[0]['value'] + 1), $arrayEnd, true);
 			if ($nextContent === false) {
@@ -300,7 +308,7 @@ class TribalScents_Sniffs_Arrays_ArrayDeclarationSniff extends Squiz_Sniffs_Arra
 			$lastIndex = $indices[($count - 1)]['value'];
 
 			$trailingContent = $phpcsFile->findPrevious(
-				PHP_CodeSniffer_Tokens::$emptyTokens,
+				Tokens::$emptyTokens,
 				($arrayEnd - 1),
 				$lastIndex,
 				true

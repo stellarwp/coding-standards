@@ -1,4 +1,11 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\Whitespace;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * Enforces spacing around logical operators and assignments, based upon Squiz code
  *
@@ -22,7 +29,7 @@
  * @author   Greg Sherwood <gsherwood@squiz.net>
  * @author   Marc McIntyre <mmcintyre@squiz.net>
  */
-class TribalScents_Sniffs_Whitespace_ControlStructureSpacingSniff implements PHP_CodeSniffer_Sniff
+class ControlStructureSpacingSniff implements Sniff
 {
 	/**
 	 * A list of tokenizers this sniff supports.
@@ -53,13 +60,13 @@ class TribalScents_Sniffs_Whitespace_ControlStructureSpacingSniff implements PHP
 	/**
 	 * Processes this test, when one of its tokens is encountered.
 	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-	 * @param int                  $stackPtr  The position of the current token in the
-	 *                                        stack passed in $tokens.
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int  $stackPtr  The position of the current token in the
+	 *                        stack passed in $tokens.
 	 *
 	 * @return void
 	 */
-	public function process( PHP_CodeSniffer_File $phpcsFile, $stackPtr )
+	public function process( File $phpcsFile, $stackPtr )
 	{
 		$tokens = $phpcsFile->getTokens();
 
@@ -71,7 +78,7 @@ class TribalScents_Sniffs_Whitespace_ControlStructureSpacingSniff implements PHP
 		$scopeCloser = $tokens[ $stackPtr ]['scope_closer'];
 		$scopeOpener = $tokens[ $stackPtr ]['scope_opener'];
 
-		$openBracket = $phpcsFile->findNext( PHP_CodeSniffer_Tokens::$emptyTokens, ( $stackPtr + 1 ), null, true );
+		$openBracket = $phpcsFile->findNext( Tokens::$emptyTokens, ( $stackPtr + 1 ), null, true );
 
 		if ( $tokens[ ( $openBracket + 1 ) ]['code'] !== T_WHITESPACE && $tokens[ ( $openBracket + 1 ) ]['code'] !== T_CLOSE_PARENTHESIS )
 		{
