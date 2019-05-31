@@ -1,4 +1,11 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\XSS;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Standards\TribalScents\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * Squiz_Sniffs_XSS_EscapeOutputSniff.
  *
@@ -19,7 +26,7 @@
  * @author   Weston Ruter <weston@x-team.com>
  * @link     http://codex.wordpress.org/Data_Validation Data Validation on WordPress Codex
  */
-class TribalScents_Sniffs_XSS_EscapeOutputSniff extends TribalScents_Sniff
+class EscapeOutputSniff extends Sniff
 {
 
 	/**
@@ -98,22 +105,22 @@ class TribalScents_Sniffs_XSS_EscapeOutputSniff extends TribalScents_Sniff
 	/**
 	 * Processes this test, when one of its tokens is encountered.
 	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-	 * @param int                  $stackPtr  The position of the current token
-	 *                                        in the stack passed in $tokens.
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int  $stackPtr  The position of the current token
+	 *                        in the stack passed in $tokens.
 	 *
 	 * @return int|void
 	 */
-	public function process( PHP_CodeSniffer_File $phpcsFile, $stackPtr )
+	public function process( File $phpcsFile, $stackPtr )
 	{
 		// Merge any custom functions with the defaults, if we haven't already.
 		if ( ! self::$addedCustomFunctions ) {
-			TribalScents_Sniff::$escapingFunctions = array_merge( TribalScents_Sniff::$escapingFunctions, array_flip( $this->customEscapingFunctions ) );
-			TribalScents_Sniff::$autoEscapedFunctions = array_merge( TribalScents_Sniff::$autoEscapedFunctions, array_flip( $this->customAutoEscapedFunctions ) );
-			TribalScents_Sniff::$printingFunctions = array_merge( TribalScents_Sniff::$printingFunctions, array_flip( $this->customPrintingFunctions ) );
+			Sniff::$escapingFunctions = array_merge( Sniff::$escapingFunctions, array_flip( $this->customEscapingFunctions ) );
+			Sniff::$autoEscapedFunctions = array_merge( Sniff::$autoEscapedFunctions, array_flip( $this->customAutoEscapedFunctions ) );
+			Sniff::$printingFunctions = array_merge( Sniff::$printingFunctions, array_flip( $this->customPrintingFunctions ) );
 
 			if ( ! empty( $this->customSanitizingFunctions ) ) {
-				TribalScents_Sniff::$escapingFunctions = array_merge( TribalScents_Sniff::$escapingFunctions, array_flip( $this->customSanitizingFunctions ) );
+				Sniff::$escapingFunctions = array_merge( Sniff::$escapingFunctions, array_flip( $this->customSanitizingFunctions ) );
 				$phpcsFile->addWarning( 'The customSanitizingFunctions property is deprecated in favor of customEscapingFunctions.', 0, 'DeprecatedCustomSanitizingFunctions' );
 			}
 
@@ -126,7 +133,7 @@ class TribalScents_Sniffs_XSS_EscapeOutputSniff extends TribalScents_Sniff
 		$function = $tokens[ $stackPtr ]['content'];
 
 		// Find the opening parenthesis (if present; T_ECHO might not have it).
-		$open_paren = $phpcsFile->findNext( PHP_CodeSniffer_Tokens::$emptyTokens, $stackPtr + 1, null, true );
+		$open_paren = $phpcsFile->findNext( Tokens::$emptyTokens, $stackPtr + 1, null, true );
 
 		// If function, not T_ECHO nor T_PRINT
 		if ( $tokens[$stackPtr]['code'] == T_STRING ) {
@@ -165,7 +172,7 @@ class TribalScents_Sniffs_XSS_EscapeOutputSniff extends TribalScents_Sniff
 		if ( ! isset( $end_of_statement ) ) {
 
 			$end_of_statement = $phpcsFile->findNext( array( T_SEMICOLON, T_CLOSE_TAG ), $stackPtr );
-			$last_token = $phpcsFile->findPrevious( PHP_CodeSniffer_Tokens::$emptyTokens, $end_of_statement - 1, null, true );
+			$last_token = $phpcsFile->findPrevious( Tokens::$emptyTokens, $end_of_statement - 1, null, true );
 
 			// Check for the ternary operator. We only need to do this here if this
 			// echo is lacking parenthesis. Otherwise it will be handled below.

@@ -1,4 +1,12 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\PHP;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
+
 /**
  * TribalScents_Sniffs_PHP_ExtractFunctionSniff
  *
@@ -13,7 +21,7 @@
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class TribalScents_Sniffs_PHP_ExtractFunctionSniff extends Generic_Sniffs_PHP_ForbiddenFunctionsSniff
+class ExtractFunctionSniff extends PHP\ForbiddenFunctionsSniff
 {
 	/**
 	 * A list of forbidden functions with their alternatives.
@@ -30,11 +38,11 @@ class TribalScents_Sniffs_PHP_ExtractFunctionSniff extends Generic_Sniffs_PHP_Fo
 	/**
 	 * Generates the error or warning for this sniff.
 	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-	 * @param int                  $stackPtr  The position of the forbidden function
-	 *                                        in the token array.
-	 * @param string               $function  The name of the forbidden function.
-	 * @param string               $unused_pattern   The pattern used for the match.
+	 * @param File   $phpcsFile The file being scanned.
+	 * @param int    $stackPtr  The position of the forbidden function
+	 *                          in the token array.
+	 * @param string $function  The name of the forbidden function.
+	 * @param string $unused_pattern   The pattern used for the match.
 	 *
 	 * @return void
 	 */

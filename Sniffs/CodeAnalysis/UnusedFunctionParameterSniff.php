@@ -1,4 +1,11 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\CodeAnalysis;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff
  *
@@ -35,7 +42,7 @@
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements PHP_CodeSniffer_Sniff
+class UnusedFunctionParameterSniff implements Sniff
 {
 	/**
 	 * Returns an array of tokens this test wants to listen for.
@@ -50,13 +57,13 @@ class TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements P
 	/**
 	 * Processes this test, when one of its tokens is encountered.
 	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-	 * @param int                  $stackPtr  The position of the current token
-	 *                                        in the stack passed in $tokens.
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int  $stackPtr  The position of the current token
+	 *                        in the stack passed in $tokens.
 	 *
 	 * @return void
 	 */
-	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+	public function process(File $phpcsFile, $stackPtr)
 	{
 		$tokens = $phpcsFile->getTokens();
 		$token  = $tokens[$stackPtr];
@@ -81,7 +88,7 @@ class TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements P
 			$code  = $token['code'];
 
 			// Ignorable tokens.
-			if (in_array($code, PHP_CodeSniffer_Tokens::$emptyTokens) === true) {
+			if (in_array($code, Tokens::$emptyTokens) === true) {
 				continue;
 			}
 
@@ -93,7 +100,7 @@ class TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements P
 
 				// A return statement as the first content indicates an interface method.
 				if ($code === T_RETURN) {
-					$tmp = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, ($next + 1), null, true);
+					$tmp = $phpcsFile->findNext(Tokens::$emptyTokens, ($next + 1), null, true);
 					if ($tmp === false) {
 						return;
 					}
@@ -103,7 +110,7 @@ class TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements P
 						return;
 					}
 
-					$tmp = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, ($tmp + 1), null, true);
+					$tmp = $phpcsFile->findNext(Tokens::$emptyTokens, ($tmp + 1), null, true);
 					if ($tmp !== false && $tokens[$tmp]['code'] === T_SEMICOLON) {
 						// There is a return <token>.
 						return;
@@ -139,7 +146,7 @@ class TribalScents_Sniffs_CodeAnalysis_UnusedFunctionParameterSniff implements P
 					T_END_NOWDOC,
 					T_DOUBLE_QUOTED_STRING,
 				);
-				$validTokens = array_merge($validTokens, PHP_CodeSniffer_Tokens::$emptyTokens);
+				$validTokens = array_merge($validTokens, Tokens::$emptyTokens);
 
 				$content = $token['content'];
 				for ($i = ($next + 1); $i <= $end; $i++) {

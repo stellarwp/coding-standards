@@ -1,4 +1,11 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\Arrays;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * TribalScents_Sniffs_Arrays_ArrayBracketSpacingSniff.
  *
@@ -31,7 +38,7 @@
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class TribalScents_Sniffs_Arrays_ArrayBracketSpacingSniff implements PHP_CodeSniffer_Sniff
+class ArrayBracketSpacingSniff implements Sniff
 {
 	/**
 	 * Returns an array of tokens this test wants to listen for.
@@ -51,13 +58,13 @@ class TribalScents_Sniffs_Arrays_ArrayBracketSpacingSniff implements PHP_CodeSni
 	/**
 	 * Processes this sniff, when one of its tokens is encountered.
 	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The current file being checked.
-	 * @param int                  $stackPtr  The position of the current token in the
-	 *                                        stack passed in $tokens.
+	 * @param File $phpcsFile The current file being checked.
+	 * @param int  $stackPtr  The position of the current token in the
+	 *                        stack passed in $tokens.
 	 *
 	 * @return void
 	 */
-	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+	public function process(File $phpcsFile, $stackPtr)
 	{
 		$tokens = $phpcsFile->getTokens();
 
@@ -70,15 +77,15 @@ class TribalScents_Sniffs_Arrays_ArrayBracketSpacingSniff implements PHP_CodeSni
 			$openBracket = $tokens[$stackPtr]['bracket_opener'];
 		}
 
-		$prev = $phpcsFile->findPrevious(PHP_CodeSniffer_Tokens::$emptyTokens, ($openBracket - 1), null, true);
+		$prev = $phpcsFile->findPrevious(Tokens::$emptyTokens, ($openBracket - 1), null, true);
 		if ($tokens[$prev]['code'] === T_EQUAL) {
 			return;
 		}
 
 		// Square brackets can not have a space before them.
 		$prevType = $tokens[($stackPtr - 1)]['code'];
-		if ('[' == $tokens[$stackPtr]['content'] && in_array($prevType, PHP_CodeSniffer_Tokens::$emptyTokens) === true) {
-			$nonSpace = $phpcsFile->findPrevious(PHP_CodeSniffer_Tokens::$emptyTokens, ($stackPtr - 2), null, true);
+		if ('[' == $tokens[$stackPtr]['content'] && in_array($prevType, Tokens::$emptyTokens) === true) {
+			$nonSpace = $phpcsFile->findPrevious(Tokens::$emptyTokens, ($stackPtr - 2), null, true);
 			$expected = $tokens[$nonSpace]['content'].$tokens[$stackPtr]['content'];
 			$found    = $phpcsFile->getTokensAsString($nonSpace, ($stackPtr - $nonSpace)).$tokens[$stackPtr]['content'];
 			$error    = 'Space found before square bracket; expected "%s" but found "%s"';

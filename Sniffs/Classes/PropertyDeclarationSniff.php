@@ -1,4 +1,11 @@
 <?php
+namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\Classes;
+
+use PHP_CodeSniffer\Sniffs;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Util\Tokens;
+
 /**
  * Verifies that properties are declared correctly.
  *
@@ -12,10 +19,6 @@
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
-if (class_exists('PHP_CodeSniffer_Standards_AbstractVariableSniff', true) === false) {
-    throw new PHP_CodeSniffer_Exception('Class PHP_CodeSniffer_Standards_AbstractVariableSniff not found');
-}
-
 /**
  * Verifies that properties are declared correctly.
  *
@@ -27,26 +30,26 @@ if (class_exists('PHP_CodeSniffer_Standards_AbstractVariableSniff', true) === fa
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class TribalScents_Sniffs_Classes_PropertyDeclarationSniff extends PHP_CodeSniffer_Standards_AbstractVariableSniff
+class PropertyDeclarationSniff extends Sniffs\AbstractVariableSniff
 {
 
 
     /**
      * Processes the function tokens within the class.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file where this token was found.
-     * @param int                  $stackPtr  The position where the token was found.
+     * @param File $phpcsFile The file where this token was found.
+     * @param int  $stackPtr  The position where the token was found.
      *
      * @return void
      */
-    protected function processMemberVar(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processMemberVar(File $phpcsFile, $stackPtr)
     {
         $tokens = $phpcsFile->getTokens();
 
         // Detect multiple properties defined at the same time. Throw an error
         // for this, but also only process the first property in the list so we don't
         // repeat errors.
-        $find = PHP_CodeSniffer_Tokens::$scopeModifiers;
+        $find = Tokens::$scopeModifiers;
         $find = array_merge($find, array(T_VARIABLE, T_VAR, T_SEMICOLON));
         $prev = $phpcsFile->findPrevious($find, ($stackPtr - 1));
         if ($tokens[$prev]['code'] === T_VARIABLE) {
@@ -64,7 +67,7 @@ class TribalScents_Sniffs_Classes_PropertyDeclarationSniff extends PHP_CodeSniff
             $phpcsFile->addError($error, $stackPtr, 'Multiple');
         }
 
-        $modifier = $phpcsFile->findPrevious(PHP_CodeSniffer_Tokens::$scopeModifiers, $stackPtr);
+        $modifier = $phpcsFile->findPrevious(Tokens::$scopeModifiers, $stackPtr);
         if (($modifier === false) || ($tokens[$modifier]['line'] !== $tokens[$stackPtr]['line'])) {
             $error = 'Visibility must be declared on property "%s"';
             $data  = array($tokens[$stackPtr]['content']);
@@ -77,12 +80,12 @@ class TribalScents_Sniffs_Classes_PropertyDeclarationSniff extends PHP_CodeSniff
     /**
      * Processes normal variables.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file where this token was found.
-     * @param int                  $stackPtr  The position where the token was found.
+     * @param File $phpcsFile The file where this token was found.
+     * @param int  $stackPtr  The position where the token was found.
      *
      * @return void
      */
-    protected function processVariable(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processVariable(File $phpcsFile, $stackPtr)
     {
         // We don't care about normal variables.
         return;
@@ -93,12 +96,12 @@ class TribalScents_Sniffs_Classes_PropertyDeclarationSniff extends PHP_CodeSniff
     /**
      * Processes variables in double quoted strings.
      *
-     * @param PHP_CodeSniffer_File $phpcsFile The file where this token was found.
-     * @param int                  $stackPtr  The position where the token was found.
+     * @param File $phpcsFile The file where this token was found.
+     * @param int  $stackPtr  The position where the token was found.
      *
      * @return void
      */
-    protected function processVariableInString(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    protected function processVariableInString(File $phpcsFile, $stackPtr)
     {
         // We don't care about normal variables.
         return;
