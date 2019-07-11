@@ -1,0 +1,12 @@
+{
+    "name": "moderntribe/TribalScents",
+    "description": "Code sniffing rules for Modern Tribe products",
+    "type": "library",
+    "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "Modern Tribe",
+            "email": "tribe@tri.be"
+        }
+    ]
+}
