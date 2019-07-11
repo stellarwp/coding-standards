@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="TribalScents">
+	<autoload>./PHPCSAliases.php</autoload>
+	
 	<description>Modern Tribe coding standards.</description>
 	<exclude-pattern>*/.git/*</exclude-pattern>
 	<exclude-pattern>*/.svn/*</exclude-pattern>
