@@ -14,7 +14,7 @@ The Modern Tribe coding standards uses a combination of:
 
 ## Important Notes
 
-Make sure that the command `phpcs` is on the version `3.4.2`+, as it's not compatible with the latest version of the script. In order to install it on that specifc version globally you can use: 
+Make sure that the command `phpcs` is on version `3.4.2`+. In order to install it on that specifc version globally you can use: 
 
 -- `composer global require "squizlabs/php_codesniffer=3.4.2"`
 
