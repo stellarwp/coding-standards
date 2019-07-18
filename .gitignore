@@ -1,3 +1,5 @@
 .idea/
 vendor/
+phpcs.xml
+.phpcs.xml
 composer.lock
