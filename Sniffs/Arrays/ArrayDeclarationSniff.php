@@ -1,9 +1,6 @@
 <?php
 namespace Tribe\TribalScents\Sniffs\Arrays;
 
-use PHP_CodeSniffer\Sniffs;
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Util\Tokens;
 use PHP_CodeSniffer\Standards\Squiz\Sniffs\Arrays;
 

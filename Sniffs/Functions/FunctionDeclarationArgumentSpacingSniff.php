@@ -1,10 +1,8 @@
 <?php
 namespace Tribe\TribalScents\Sniffs\Functions;
 
-use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
-use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * Enforces WordPress function argument spacing, based upon Squiz code

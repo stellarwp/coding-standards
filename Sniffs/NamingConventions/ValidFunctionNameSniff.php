@@ -2,9 +2,7 @@
 namespace Tribe\TribalScents\Sniffs\NamingConventions;
 
 use PHP_CodeSniffer\Sniffs;
-use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
-use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * Enforces WordPress function name format, based upon Squiz code

@@ -1,10 +1,8 @@
 <?php
 namespace Tribe\TribalScents\Sniffs\CodeAnalysis;
 
-use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
-use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * TribalScents_Sniffs_CodeAnalysis_RedirectAndDieSniff

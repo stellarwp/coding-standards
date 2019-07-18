@@ -1,7 +1,6 @@
 <?php
 namespace Tribe\TribalScents\Sniffs\Whitespace;
 
-use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Util\Tokens;
