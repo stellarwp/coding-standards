@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="TribalScents">
-	<autoload>./PHPCSAliases.php</autoload>
-	
 	<description>Modern Tribe coding standards.</description>
-	<exclude-pattern>*/.git/*</exclude-pattern>
-	<exclude-pattern>*/.svn/*</exclude-pattern>
-	<exclude-pattern>*/vendor/*</exclude-pattern>
-	<exclude-pattern>*/external/*</exclude-pattern>
 
 	<!-- Reports errors if the same class or interface name is used in multiple files. -->
 	<rule ref="Generic.Classes.DuplicateClassName"/>
@@ -133,7 +127,7 @@
 	<!-- Visibility MUST be declared on all methods. -->
 	<rule ref="Squiz.Scope.MethodScope"/>
 	<rule ref="Squiz.WhiteSpace.ScopeKeywordSpacing"/>
-	
+
 	<!-- Checks for usage of "$this" in static methods, which will cause runtime errors. -->
 	<rule ref="Squiz.Scope.StaticThisUsage"/>
 

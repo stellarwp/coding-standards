@@ -4,6 +4,12 @@
 
     <file>TribalScents</file>
 
+	<exclude-pattern>*/.git/*</exclude-pattern>
+	<exclude-pattern>*/.svn/*</exclude-pattern>
+	<exclude-pattern>*/bin/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/external/*</exclude-pattern>
+
     <arg name="basepath" value="."/>
     <arg name="colors" />
     <arg name="parallel" value="75" />
