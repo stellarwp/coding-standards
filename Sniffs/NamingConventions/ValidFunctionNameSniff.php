@@ -1,5 +1,5 @@
 <?php
-namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\NamingConventions;
+namespace Tribe\TribalScents\Sniffs\NamingConventions;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Sniffs\Sniff;

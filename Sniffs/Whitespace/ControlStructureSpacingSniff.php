@@ -1,5 +1,5 @@
 <?php
-namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\Whitespace;
+namespace Tribe\TribalScents\Sniffs\Whitespace;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Sniffs\Sniff;

@@ -1,5 +1,5 @@
 <?php
-namespace PHP_CodeSniffer\Standards\TribalScents\Sniffs\XSS;
+namespace Tribe\TribalScents\Sniffs\XSS;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Standards\TribalScents\Sniff;

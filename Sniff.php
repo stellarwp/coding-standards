@@ -8,7 +8,7 @@
  * @package   PHP_CodeSniffer
  */
 
-namespace PHP_CodeSniffer\Standards\TribalScents;
+namespace Tribe\TribalScents;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Sniffs\Sniff as CS_Sniff;
