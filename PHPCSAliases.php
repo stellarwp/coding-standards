@@ -64,7 +64,7 @@ if ( ! \defined( 'TRIBALSCENTS_PHPCS_ALIASES_SET' ) ) {
 	spl_autoload_register(
 		function ( $class ) {
 			// Only try & load our own classes.
-			if ( stripos( $class, 'Tribe\\TribalScents' ) !== 0 ) {
+			if ( stripos( $class, 'TribalScents' ) !== 0 ) {
 				return;
 			}
 
