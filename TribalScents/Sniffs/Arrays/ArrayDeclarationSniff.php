@@ -1,5 +1,5 @@
 <?php
-namespace Tribe\TribalScents\Sniffs\Arrays;
+namespace TribalScents\Sniffs\Arrays;
 
 use PHP_CodeSniffer\Util\Tokens;
 use PHP_CodeSniffer\Standards\Squiz\Sniffs\Arrays;

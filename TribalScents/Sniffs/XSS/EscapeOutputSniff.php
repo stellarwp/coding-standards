@@ -1,9 +1,9 @@
 <?php
-namespace Tribe\TribalScents\Sniffs\XSS;
+namespace TribalScents\Sniffs\XSS;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Util\Tokens;
-use Tribe\TribalScents\Sniff;
+use TribalScents\Sniff;
 
 /**
  * Squiz_Sniffs_XSS_EscapeOutputSniff.

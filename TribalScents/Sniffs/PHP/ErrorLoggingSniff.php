@@ -1,11 +1,11 @@
 <?php
-namespace Tribe\TribalScents\Sniffs\CodeAnalysis;
+namespace TribalScents\Sniffs\PHP;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 
 /**
- * TribalScents_Sniffs_CodeAnalysis_RedirectAndDieSniff
+ * TribalScents_Sniffs_PHP_ErrorLoggingSniff
  *
  * Throw an error if error loggins functions are in use
  *
@@ -17,7 +17,7 @@ use PHP_CodeSniffer\Files\File;
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class RedirectAndDieSniff implements Sniff
+class ErrorLoggingSniff implements Sniff
 {
 	/**
 	 * A list of tokenizers this sniff supports.
@@ -26,6 +26,20 @@ class RedirectAndDieSniff implements Sniff
 	 */
 	public $supportedTokenizers = array(
 		'PHP',
+	);
+
+	/**
+	 * A list of forbidden functions with their alternatives.
+	 *
+	 * The value is NULL if no alternative exists. i.e. the
+	 * function should just not be used.
+	 *
+	 * @var array(string => string|null)
+	 */
+	protected $forbidden = array(
+		'error_log',
+		'wlog',
+		'golog',
 	);
 
 	/**
@@ -70,22 +84,29 @@ class RedirectAndDieSniff implements Sniff
 			return;
 		}//end if
 
-		if ( ! in_array( $function, array( 'wp_redirect', 'wp_safe_redirect' ) ) )
+		if ( 'do_action' == $function )
 		{
+			$next = $phpcsFile->findNext( T_CONSTANT_ENCAPSED_STRING, $stackPtr );
+
+			if ( ! preg_match( '/("|\')debug_robot("|\')/', $tokens[ $next ]['content'] ) )
+			{
+				return;
+			}//end if
+
+			$data = array( $function );
+			$type  = 'Found';
+			$error = "Don't leave debug_robot lying around";
+			$phpcsFile->addError( $error, $stackPtr, $type, $data );
 			return;
 		}//end if
-
-		$semicolon = $phpcsFile->findNext( T_SEMICOLON, $stackPtr );
-		$next = $tokens[ $phpcsFile->findNext( T_WHITESPACE, $semicolon + 1, NULL, TRUE ) ];
-
-		if ( T_EXIT == $next['code'] || 'tribe_exit' == $next['content'] )
+		elseif ( FALSE === in_array( $function, $this->forbidden ) )
 		{
 			return;
-		}//end if
+		}//end elseif
 
 		$data = array( $function );
-		$type  = 'Error';
-		$error = "die must follow {$function}";
+		$type  = 'Found';
+		$error = "Don't leave {$function} lying around";
 		$phpcsFile->addError( $error, $stackPtr, $type, $data );
 	}//end process
 }//end class

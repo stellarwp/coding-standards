@@ -1,24 +1,25 @@
 <?php
-namespace Tribe\TribalScents\Sniffs\PHP;
+namespace TribalScents\Sniffs\PHP;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
 
 /**
- * TribalScents_Sniffs_PHP_IsAFunctionSniff
+ * TribalScents_Sniffs_PHP_EscjsFunctionSniff
  *
- * Throw an error if extract is used
+ * Throw an error if esc_js is used
  *
  * @category  PHP
  * @package   PHP_CodeSniffer
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
+ * @author    Stephen Page <stephenjpage@gmail.com>
  * @copyright 2012 ModernTribe
  * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class IsAFunctionSniff extends PHP\ForbiddenFunctionsSniff
+class EscjsFunctionSniff extends PHP\ForbiddenFunctionsSniff
 {
 	/**
 	 * A list of forbidden functions with their alternatives.
@@ -29,15 +30,15 @@ class IsAFunctionSniff extends PHP\ForbiddenFunctionsSniff
 	 * @var array(string => string|null)
 	 */
 	public $forbiddenFunctions = array(
-		'is_a' => 'instanceof',
+		'esc_js' => 'json_encode',
 	);
 
 	/**
-	 * Generates the error or warning for this sniff.
+	 * Generates the error or wanrning for this sniff.
 	 *
 	 * @param File   $phpcsFile The file being scanned.
 	 * @param int    $stackPtr  The position of the forbidden function
-	 *                          in the token array.
+	 *                                        in the token array.
 	 * @param string $function  The name of the forbidden function.
 	 * @param string $unused_pattern   The pattern used for the match.
 	 *
@@ -46,11 +47,11 @@ class IsAFunctionSniff extends PHP\ForbiddenFunctionsSniff
 	protected function addError( $phpcsFile, $stackPtr, $function, $unused_pattern = NULL )
 	{
 		$data  = array( $function );
-		$error = 'is_a()? Really?';
+		$error = 'Barf out, gag me with a spoon! esc_js()!';
 
 		if ( $this->forbiddenFunctions[ $function ] )
 		{
-			$error .= ' Use ' . $this->forbiddenFunctions[ $function ] . ' instead.';
+			$error .= 'This is for inline javascript, which is against our standards. Use ' . $this->forbiddenFunctions[ $function ] . ' instead.';
 		}//end if
 
 		$type  = 'Found';
