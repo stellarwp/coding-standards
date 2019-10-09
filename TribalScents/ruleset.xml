@@ -3,8 +3,8 @@
 	<description>Modern Tribe coding standards.</description>
 	
 	<!-- Warns about missing short descriptions in docblocks. -->
-	<rule ref="Generic.Commenting.DocComment.MissingShort">
-		<severity>0</severity>
+	<rule ref="Generic.Commenting.DocComment">
+		<exclude name="Generic.Commenting.DocComment.MissingShort" />
 	</rule>
 	
 	<!-- Warns about FIXME comments. -->
