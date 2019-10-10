@@ -28,6 +28,10 @@
 	<!-- Ensures all class keywords are lowercase. -->
 	<rule ref="Squiz.Classes.LowercaseClassKeywords"/>
 
+	<rule ref="Squiz.Commenting.FileComment">
+		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
+	</rule>
+	
 	<!-- Ensures all control structure keywords are lowercase. -->
 	<rule ref="Squiz.ControlStructures.LowercaseDeclaration"/>
 
