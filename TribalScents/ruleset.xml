@@ -25,13 +25,14 @@
 	<!-- A Sniff to ensure that parameters defined for a function that have a default value come at the end of the function signature. -->
 	<rule ref="PEAR.Functions.ValidDefaultValue"/>
 
+	<rule ref="Squiz">
+		<exclude name="Squiz.Arrays.DisallowShortArraySyntax" />
+		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
+	</rule>
+
 	<!-- Ensures all class keywords are lowercase. -->
 	<rule ref="Squiz.Classes.LowercaseClassKeywords"/>
 
-	<rule ref="Squiz.Commenting.FileComment">
-		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
-	</rule>
-	
 	<!-- Ensures all control structure keywords are lowercase. -->
 	<rule ref="Squiz.ControlStructures.LowercaseDeclaration"/>
 
