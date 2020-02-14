@@ -25,8 +25,7 @@
 	<!-- A Sniff to ensure that parameters defined for a function that have a default value come at the end of the function signature. -->
 	<rule ref="PEAR.Functions.ValidDefaultValue"/>
 
-	<rule ref="Squiz">
-		<exclude name="Generic.Arrays.DisallowShortArraySyntax" />
+	<rule ref="Squiz.Commenting.FileComment">
 		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
 	</rule>
 
