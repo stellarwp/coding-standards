@@ -5,6 +5,7 @@
 	<!-- Warns about missing short descriptions in docblocks. -->
 	<rule ref="Generic.Commenting.DocComment">
 		<exclude name="Generic.Commenting.DocComment.MissingShort" />
+		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
 	
 	<!-- Warns about FIXME comments. -->
@@ -27,6 +28,7 @@
 
 	<rule ref="Squiz.Commenting.FileComment">
 		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
+		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
 
 	<!-- Ensures all class keywords are lowercase. -->
