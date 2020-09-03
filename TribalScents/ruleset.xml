@@ -58,4 +58,7 @@
 	<rule ref="TribalScents.Arrays.ArrayDeclaration">
 		<exclude name="TribalScents.Arrays.ArrayDeclaration.SingleLineNotAllowed" />
 	</rule>
+
+	<!-- We always want short array syntax only. -->
+	<rule ref="Generic.Arrays.DisallowLongArraySyntax" />
 </ruleset>
