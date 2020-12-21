@@ -1,9 +1,9 @@
 Tribal Scents
 ==================
 
-Modern Tribe standards for PHP CodeSniffer
+The Events Calendar standards for PHP CodeSniffer
 
-The Modern Tribe coding standards uses a combination of:
+The Events Calendar coding standards uses a combination of:
 * Generic (part of PHP_CodeSniffer)
 * PEAR (part of PHP_CodeSniffer)
 * PSR2 (part of PHP_CodeSniffer)
