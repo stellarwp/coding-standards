@@ -1,5 +1,5 @@
 {
-    "name": "moderntribe/TribalScents",
+    "name": "the-events-calendar/TribalScents",
     "description": "Code sniffing rules for Modern Tribe products",
     "type": "phpcodesniffer-standard",
     "license": "GPL-3.0+",
@@ -10,8 +10,8 @@
     ],
     "authors": [
         {
-            "name": "Modern Tribe",
-            "email": "tribe@tri.be"
+            "name": "The Events Calendar",
+            "email": "vendors@theeventscalendar.com"
         }
     ],
     "require": {
