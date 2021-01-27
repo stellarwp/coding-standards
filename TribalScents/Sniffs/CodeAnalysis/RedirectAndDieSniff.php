@@ -12,8 +12,8 @@ use PHP_CodeSniffer\Files\File;
  * @category  PHP
  * @package   PHP_CodeSniffer
  * @author    Matthew Batchelder <borkweb@gmail.com>
- * @copyright 2014 ModernTribe
- * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
+ * @copyright 2014 The Events Calendar
+ * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */

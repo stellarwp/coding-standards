@@ -9,7 +9,7 @@ use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
  *
  * This is a shameless copy of the work done by Squizlabs, specifically
  * Greg Sherwood <gsherwood@squiz.net> and Marc McIntyre <mmcintyre@squiz.net>,
- * but modified to match ModernTribe standards.
+ * but modified to match The Events Calendar standards.
  *
  * PHP version 5
  *
@@ -17,8 +17,8 @@ use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
  * @package   PHP_CodeSniffer
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
- * @copyright 2012 ModernTribe
- * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
+ * @copyright 2012 The Events Calendar
+ * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -32,8 +32,8 @@ use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
  * @package   PHP_CodeSniffer
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
- * @copyright 2012 ModernTribe
- * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
+ * @copyright 2012 The Events Calendar
+ * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
