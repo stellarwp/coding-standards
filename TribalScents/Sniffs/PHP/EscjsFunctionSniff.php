@@ -14,8 +14,8 @@ use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @author    Stephen Page <stephenjpage@gmail.com>
- * @copyright 2012 ModernTribe
- * @license   https://github.com/moderntribe/TribalScents/blob/master/licence.txt BSD Licence
+ * @copyright 2012 The Events Calendar
+ * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
