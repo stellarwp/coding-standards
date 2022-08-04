@@ -81,35 +81,24 @@ class VarSpacingSniff implements Sniff
 			return;
 		}//end if
 
-		$error_message = [];
-
-		if ( ! in_array( $token['code'], array( T_ARRAY, T_FUNCTION, T_OPEN_PARENTHESIS, T_OPEN_SQUARE_BRACKET ) ) )
-		{
-			if ( ' ' != $tokens[ $stackPtr + 1 ]['content'] )
-			{
-				$error_messages[] = "There must be a space between {$token['content']} and the first parenthesis '('.";
-			}//end if
-		}//end if
-
 		if ( isset( $token['parenthesis_closer'] ) )
 		{
 			$after_opener = $tokens[ $token[ 'parenthesis_opener' ] + 1 ];
 			$before_closer = $tokens[ $token[ 'parenthesis_closer' ] - 1 ];
 
 			if (
-				T_CLOSE_PARENTHESIS != $after_opener['code']
-				&& T_WHITESPACE != $after_opener['code']
+				(
+					T_CLOSE_PARENTHESIS != $after_opener['code']
+					&& T_WHITESPACE != $after_opener['code']
+				)
+				|| (
+					T_OPEN_PARENTHESIS != $before_closer['code']
+					&& T_WHITESPACE != $before_closer['code']
+				)
 			)
 			{
-				$error_messages[] = 'There must be a single space after the first parenthesis.';
-			}//end if
-
-			if (
-				T_OPEN_PARENTHESIS != $before_closer['code']
-				&& T_WHITESPACE != $before_closer['code']
-			)
-			{
-				$error_messages[] = 'There must be a single space before the last parenthesis.';
+				$error = 'There must be a single space after the first parenthesis and a single space before the last parenthesis.';
+				$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 			}//end if
 		}//end if
 		else
@@ -118,28 +107,23 @@ class VarSpacingSniff implements Sniff
 			$before_closer = $tokens[ $token[ 'bracket_closer' ] - 1 ];
 
 			if (
-				T_CLOSE_SQUARE_BRACKET != $after_opener['code']
-				&& T_LNUMBER != $after_opener['code']
-				&& T_WHITESPACE != $after_opener['code']
-				&& T_CONSTANT_ENCAPSED_STRING != $after_opener['code']
+				(
+					T_CLOSE_SQUARE_BRACKET != $after_opener['code']
+					&& T_LNUMBER != $after_opener['code']
+					&& T_WHITESPACE != $after_opener['code']
+					&& T_CONSTANT_ENCAPSED_STRING != $after_opener['code']
+				)
+				|| (
+					T_OPEN_SQUARE_BRACKET != $before_closer['code']
+					&& T_LNUMBER != $before_closer['code']
+					&& T_WHITESPACE != $before_closer['code']
+					&& T_CONSTANT_ENCAPSED_STRING != $before_closer['code']
+				)
 			)
 			{
-				$error_messages[] = 'There must be a single space after the first square bracket.';
-			}//end if
-
-			if (
-				T_OPEN_SQUARE_BRACKET != $before_closer['code']
-				&& T_LNUMBER != $before_closer['code']
-				&& T_WHITESPACE != $before_closer['code']
-				&& T_CONSTANT_ENCAPSED_STRING != $before_closer['code']
-			)
-			{
-				$error_messages[] = 'There must be a single space before the last square bracket.';
+				$error = 'There must be a single space after the first square bracket and a single space before the last square bracket.';
+				$phpcsFile->addError( $error, $stackPtr, 'invalidWhitespace' );
 			}//end if
 		}//end else
-
-		if ( ! empty( $error_message ) ) {
-			$phpcsFile->addError( implode( "\n", $error_messages ), $stackPtr, 'invalidWhitespace' );
-		}
 	}//end process
 }//end class
