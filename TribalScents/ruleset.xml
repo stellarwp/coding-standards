@@ -2,6 +2,15 @@
 <ruleset name="TribalScents" namespace="TribalScents" >
 	<description>The Events Calendar coding standards.</description>
 
+	<rule ref="WordPress-VIP-Go"/>
+	<rule ref="WordPress-Docs">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress">
+		<exclude name="WordPress.Files.FileName"/>
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+	</rule>
+
 	<!-- Warns about missing short descriptions in docblocks. -->
 	<rule ref="Generic.Commenting.DocComment">
 		<exclude name="Generic.Commenting.DocComment.MissingShort" />
@@ -31,14 +40,8 @@
 		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
 
-	<!-- Ensures all class keywords are lowercase. -->
-	<rule ref="Squiz.Classes.LowercaseClassKeywords"/>
-
 	<!-- Ensures all control structure keywords are lowercase. -->
 	<rule ref="Squiz.ControlStructures.LowercaseDeclaration"/>
-
-	<!-- Ensures all class keywords are lowercase. -->
-	<rule ref="Squiz.Functions.LowercaseFunctionKeywords"/>
 
 	<!-- Ensures all calls to inbuilt PHP functions are lowercase. -->
 	<rule ref="Squiz.PHP.LowercasePHPFunctions"/>
@@ -49,16 +52,14 @@
 	<!-- Checks for usage of "$this" in static methods, which will cause runtime errors. -->
 	<rule ref="Squiz.Scope.StaticThisUsage"/>
 
-	<!-- Makes sure that any use of Double Quotes ("") are warranted. -->
-	<rule ref="Squiz.Strings.DoubleQuoteUsage"/>
-	<rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
-		<severity>0</severity>
-	</rule>
-
-	<rule ref="TribalScents.Arrays.ArrayDeclaration">
-		<exclude name="TribalScents.Arrays.ArrayDeclaration.SingleLineNotAllowed" />
-	</rule>
-
 	<!-- We always want short array syntax only. -->
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+
+	<!--exclude the rule for violation of direct DB calls as some have no alternative-->
+	<rule ref="WordPress.DB.DirectDatabaseQuery">
+		<exclude-pattern>src/Test.php</exclude-pattern>
+	</rule>
+
+	<exclude-pattern>*/tests/_support/_generated/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
 </ruleset>
