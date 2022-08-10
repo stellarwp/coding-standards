@@ -1,5 +1,5 @@
 <?php
-namespace TribalScents\Sniffs\Classes;
+namespace TEC\Sniffs\Classes;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -20,8 +20,6 @@ use PHP_CodeSniffer\Files\File;
  */
 
 /**
- * TribalScents_Sniffs_Classes_ValidClassNameSniff.
- *
  * Ensures classes are in camel caps, and the first letter is capitalised
  *
  * @category  PHP

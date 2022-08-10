@@ -1,13 +1,11 @@
 <?php
-namespace TribalScents\Sniffs\Methods;
+namespace TEC\Sniffs\Methods;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Util\Tokens;
 
 /**
- * TribalScents_Sniffs_Methods_MethodDeclarationSniff.
- *
  * PHP version 5
  *
  * @category  PHP
@@ -19,8 +17,6 @@ use PHP_CodeSniffer\Util\Tokens;
  */
 
 /**
- * TribalScents_Sniffs_Methods_MethodDeclarationSniff.
- *
  * Checks that the method declaration is correct.
  *
  * @category  PHP

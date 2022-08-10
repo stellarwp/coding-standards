@@ -1,5 +1,5 @@
 <?php
-namespace TribalScents\Sniffs\Whitespace;
+namespace TEC\Sniffs\Whitespace;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
@@ -17,8 +17,6 @@ use PHP_CodeSniffer\Files\File;
  */
 
 /**
- * TribalScents_Sniffs_WhiteSpace_LogicalNotSpacingSniff.
- *
  * @category  PHP
  * @package   PHP_CodeSniffer
  * @author    John Godley <john@urbangiraffe.com>

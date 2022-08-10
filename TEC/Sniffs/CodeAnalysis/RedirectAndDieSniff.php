@@ -1,19 +1,17 @@
 <?php
-namespace TribalScents\Sniffs\CodeAnalysis;
+namespace TEC\Sniffs\CodeAnalysis;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 
 /**
- * TribalScents_Sniffs_CodeAnalysis_RedirectAndDieSniff
- *
  * Throw an error if error loggins functions are in use
  *
  * @category  PHP
  * @package   PHP_CodeSniffer
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @copyright 2014 The Events Calendar
- * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/the-events-calendar/coding-standards/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */

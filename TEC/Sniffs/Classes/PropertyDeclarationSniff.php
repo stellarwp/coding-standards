@@ -1,5 +1,5 @@
 <?php
-namespace TribalScents\Sniffs\Classes;
+namespace TEC\Sniffs\Classes;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Files\File;

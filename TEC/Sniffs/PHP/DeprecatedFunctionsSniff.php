@@ -1,12 +1,10 @@
 <?php
-namespace TribalScents\Sniffs\PHP;
+namespace TEC\Sniffs\PHP;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
 
 /**
- * TribalScents_Sniffs_PHP_DeprecatedFunctionsSniff.
- *
  * This is a shameless copy of the work done by Squizlabs, specifically
  * Greg Sherwood <gsherwood@squiz.net> and Marc McIntyre <mmcintyre@squiz.net>,
  * but modified to match The Events Calendar standards.
@@ -18,13 +16,11 @@ use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @copyright 2012 The Events Calendar
- * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/the-events-calendar/coding-standards/blob/master/licence.txt BSD Licence
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
 /**
- * TribalScents_Sniffs_PHP_DeprecatedFunctionsSniff.
- *
  * Discourages the use of deprecated WordPress functions that are kept in PHP for
  * compatibility with older versions.
  *
@@ -33,7 +29,7 @@ use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @copyright 2012 The Events Calendar
- * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/the-events-calendar/coding-standards/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */

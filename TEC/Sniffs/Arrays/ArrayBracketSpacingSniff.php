@@ -1,13 +1,11 @@
 <?php
-namespace TribalScents\Sniffs\Arrays;
+namespace TEC\Sniffs\Arrays;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Util\Tokens;
 
 /**
- * TribalScents_Sniffs_Arrays_ArrayBracketSpacingSniff.
- *
  * This is a shameless copy of the work done by Squizlabs, specifically
  * Greg Sherwood <gsherwood@squiz.net> and Marc McIntyre <mmcintyre@squiz.net>,
  * but modified to match The Events Calendar standards.
@@ -19,7 +17,7 @@ use PHP_CodeSniffer\Util\Tokens;
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @copyright 2012 The Events Calendar
- * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/the-events-calendar/coding-standards/blob/master/licence.txt BSD Licence
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -33,7 +31,7 @@ use PHP_CodeSniffer\Util\Tokens;
  * @author    Matthew Batchelder <borkweb@gmail.com>
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @copyright 2012 The Events Calendar
- * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/the-events-calendar/coding-standards/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */

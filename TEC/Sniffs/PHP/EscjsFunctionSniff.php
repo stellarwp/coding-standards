@@ -1,12 +1,10 @@
 <?php
-namespace TribalScents\Sniffs\PHP;
+namespace TEC\Sniffs\PHP;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
 
 /**
- * TribalScents_Sniffs_PHP_EscjsFunctionSniff
- *
  * Throw an error if esc_js is used
  *
  * @category  PHP
@@ -15,7 +13,7 @@ use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP;
  * @author    Zachary Tirrell <zbtirrell@gmail.com>
  * @author    Stephen Page <stephenjpage@gmail.com>
  * @copyright 2012 The Events Calendar
- * @license   https://github.com/the-events-calendar/TribalScents/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/the-events-calendar/coding-standards/blob/master/licence.txt BSD Licence
  * @version   Release: 1.4.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
