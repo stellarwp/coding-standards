@@ -1,4 +1,4 @@
-Tribal Scents
+Coding Standards
 ==================
 
 The Events Calendar standards for PHP CodeSniffer
