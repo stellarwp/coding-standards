@@ -9,6 +9,9 @@
 	<rule ref="WordPress">
 		<exclude name="WordPress.Files.FileName"/>
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax.Found"/>
+		<!-- https://github.com/WordPress/WordPress-Coding-Standards/issues/2374 -->
+		<exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
 	</rule>
 
 	<!-- Warns about missing short descriptions in docblocks. -->
