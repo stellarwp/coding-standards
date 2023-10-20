@@ -64,7 +64,7 @@
 		<exclude-pattern>src/Test.php</exclude-pattern>
 	</rule>
 
-		<!-- Detect Unused Use statements -->
+	<!-- Detect Unused Use statements -->
 	<rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
 		<properties>
 			<property name="searchAnnotations" value="true"/>
