@@ -64,6 +64,26 @@
 		<exclude-pattern>src/Test.php</exclude-pattern>
 	</rule>
 
+		<!-- Detect Unused Use statements -->
+	<rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+		<properties>
+			<property name="searchAnnotations" value="true"/>
+		</properties>
+	</rule>
+
+	<rule ref="SlevomatCodingStandard.Namespaces.UselessAlias"/>
+
+	<!-- Forbid uses of multiple traits separated by comma -->
+	<rule ref="SlevomatCodingStandard.Classes.TraitUseDeclaration" />
+	
+	<!-- Force trailing commas in arrays -->
+	<rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/>
+
+	<rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
+	<rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator"/>
+	<rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
+	<rule ref="SlevomatCodingStandard.Variables.UselessVariable"/>
+
 	<exclude-pattern>*/tests/_support/_generated/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 </ruleset>
