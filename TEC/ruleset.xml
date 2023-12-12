@@ -75,7 +75,7 @@
 
 	<!-- Forbid uses of multiple traits separated by comma -->
 	<rule ref="SlevomatCodingStandard.Classes.TraitUseDeclaration" />
-	
+
 	<!-- Force trailing commas in arrays -->
 	<rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/>
 
