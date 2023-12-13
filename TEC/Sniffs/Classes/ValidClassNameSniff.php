@@ -42,7 +42,7 @@ class ValidClassNameSniff implements Sniff {
 
 		// Check if the class name is in Capitalized_Snake_Case format where each word starts with a capital letter.
 		// This also allows for the older double-underscore method of namespacing.
-		if ( ! preg_match( '/^(?:[A-Z][a-z]*){1}(?:_{1,2}[A-Z][a-z]*]*)+$/', $tokens[ $className ]['content'] ) ) {
+		if ( ! preg_match( '/^(?:[A-Z]+[a-z\d]*)(?:(?:_[A-Z]+[a-z\d]*)*|(?:__[A-Z]+[a-z\d]*)*)$/', $tokens[ $className ]['content'] ) ) {
 			$phpcsFile->addError(
 				'Class name "%s" is not in Capitalized_Snake_Case format',
 				$stackPtr,
