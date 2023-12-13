@@ -3,3 +3,4 @@ vendor/
 phpcs.xml
 .phpcs.xml
 composer.lock
+.DS_Store
