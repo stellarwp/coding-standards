@@ -1,6 +1,6 @@
 {
-    "name": "the-events-calendar/coding-standards",
-    "description": "Code sniffing rules for The Events Calendar products",
+    "name": "stellarwp/coding-standards",
+    "description": "Code sniffing rules for StellarWP",
     "type": "phpcodesniffer-standard",
     "license": "GPL-3.0+",
     "keywords": [
@@ -10,8 +10,8 @@
     ],
     "authors": [
         {
-            "name": "The Events Calendar",
-            "email": "vendors@theeventscalendar.com"
+            "name": "StellarWP",
+            "email": "vendors@stellarwp.com"
         }
     ],
     "require": {
