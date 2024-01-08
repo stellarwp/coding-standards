@@ -12,6 +12,10 @@
         {
             "name": "StellarWP",
             "email": "vendors@stellarwp.com"
+        },
+        {
+            "name": "Matthew Batchelder",
+            "email": "borkweb@gmail.com"
         }
     ],
     "require": {
