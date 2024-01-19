@@ -84,6 +84,12 @@
 	<rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
 	<rule ref="SlevomatCodingStandard.Variables.UselessVariable"/>
 
+	<!-- Don't check test-generated files. -->
 	<exclude-pattern>*/tests/_support/_generated/*</exclude-pattern>
+
+	<!-- Don't check snapshots - "fixing" them breaks them. -->
+	<exclude-pattern>*/tests/**/_snapshots/*</exclude-pattern>
+
+	<!-- Don't check vendor files whose standards may be different. -->
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 </ruleset>
