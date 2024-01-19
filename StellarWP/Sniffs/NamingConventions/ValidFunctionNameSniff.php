@@ -1,5 +1,5 @@
 <?php
-namespace TEC\Sniffs\NamingConventions;
+namespace StellarWP\Sniffs\NamingConventions;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Files\File;
@@ -129,4 +129,3 @@ class ValidFunctionNameSniff extends Sniffs\AbstractScopeSniff
         }
     }//end processTokenOutsideScope()
 }//end class
-

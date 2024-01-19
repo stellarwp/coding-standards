@@ -8,7 +8,7 @@
  * @package   PHP_CodeSniffer
  */
 
-namespace TEC;
+namespace StellarWP;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Sniffs\Sniff as CS_Sniff;

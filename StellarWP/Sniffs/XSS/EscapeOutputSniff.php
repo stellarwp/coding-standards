@@ -1,9 +1,9 @@
 <?php
-namespace TEC\Sniffs\XSS;
+namespace StellarWP\Sniffs\XSS;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Util\Tokens;
-use TEC\Sniff;
+use StellarWP\Sniff;
 
 /**
  * Squiz_Sniffs_XSS_EscapeOutputSniff.

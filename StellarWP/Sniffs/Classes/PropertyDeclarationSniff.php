@@ -1,5 +1,5 @@
 <?php
-namespace TEC\Sniffs\Classes;
+namespace StellarWP\Sniffs\Classes;
 
 use PHP_CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Files\File;
@@ -109,4 +109,3 @@ class PropertyDeclarationSniff extends Sniffs\AbstractVariableSniff
 
 
 }//end class
-
