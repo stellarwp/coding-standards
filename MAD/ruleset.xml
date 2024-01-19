@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="Nexcess">
-    <description>Coding standards for Nexcess packages.</description>
+<ruleset name="MAD">
+    <description>Coding standards for MAD packages.</description>
 
     <!-- Enables parallel processing when available for faster results. -->
     <arg name="parallel" value="8"/>
