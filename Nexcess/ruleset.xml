@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<ruleset name="Nexcess">
+    <description>Coding standards for Nexcess packages.</description>
+
+    <!-- Enables parallel processing when available for faster results. -->
+    <arg name="parallel" value="8"/>
+
+    <!-- Start with PSR-12 as a base. -->
+    <rule ref="PSR12">
+        <!--
+            We don't have an easy way of reading the "testVersion" configuration value to selectively-
+            apply this rule, but class constant visibility isn't available in PHP < 7.1 so we'll just
+            exclude the rule for now.
+        -->
+        <exclude name="PSR12.Properties.ConstantVisibility.NotFound"/>
+    </rule>
+
+    <!-- Import select WordPress rules. -->
+    <rule ref="WordPress.PHP">
+        <!-- Short-ternaries are fine. -->
+        <exclude name="WordPress.PHP.DisallowShortTernary" />
+    </rule>
+    <rule ref="WordPress.Security"/>
+    <rule ref="WordPress.WP">
+        <!-- This rule has been deprecated, but will pop up sometimes. -->
+        <exclude name="WordPress.WP.TimezoneChange" />
+    </rule>
+
+    <!-- WordPress Documentation standards -->
+    <rule ref="WordPress-Docs">
+        <exclude name="Generic.Commenting.DocComment.MissingShort" />
+        <exclude name="Squiz.Commenting.ClassComment.Missing" />
+        <exclude name="Squiz.Commenting.FileComment.Missing" />
+        <exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
+        <exclude name="Squiz.Commenting.FileComment.MissingSubpackageTag" />
+        <exclude name="Squiz.Commenting.FileComment.SpacingAfterOpen" />
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment" />
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint" />
+
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+
+    <!-- PHPCompatibilityWP -->
+    <!-- https://github.com/PHPCompatibility/PHPCompatibilityWP -->
+    <rule ref="PHPCompatibilityWP"/>
+
+    <!-- Disallow long array syntax. -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+
+    <!--
+        Don't complain about missing elements in DocBlocks when {@inheritDoc} is used.
+
+        The inline `{@inheritDoc}` is only meant to be used for extending method descriptions, but the
+        "inherit everything, including arguments + return values" alternative, `@inheritDoc` (no curly-
+        braces) was never made official. As a result, many IDEs have chosen to interpret the inline
+        version as full-inheritance.
+
+        In order to prevent PHP_CodeSniffer from assuming we forgot to write documentation that *should*
+        be implicitly inherited, we're allowing `{@inheritDoc}`, even if it's not _technically_ correct.
+
+        Reference: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Customisable-Sniff-Properties#squizcommentingfunctioncomment
+        Discussion: https://github.com/stellarwp/coding-standards/pull/3#discussion_r819890070
+    -->
+    <rule ref="Squiz.Commenting.FunctionComment">
+        <properties>
+            <property name="skipIfInheritdoc" value="true" />
+        </properties>
+    </rule>
+
+    <!--
+        Special rules for tests:
+        1. Test classes may use snake_case for method names (PSR1.Methods.CamelCapsMethodName.NotCamelCaps)
+        2. Test classes can use whatever methods they'd like (WordPress.PHP.DiscouragedPHPFunctions, WordPress.PHP.DevelopmentFunctions)
+        3. Test bootstrap files may both define symbols and have side-effects (PSR1.Files.SideEffects.FoundWithSymbols)
+    -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.PHP.DiscouragedPHPFunctions">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.PHP.DevelopmentFunctions">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+
+    <!--
+        Define the WordPress i18n text-domain.
+
+        Reference: https://github.com/WordPress/WordPress-Coding-Standards/wiki/Customizable-sniff-properties#internationalization-setting-your-text-domain
+    -->
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="stellarwp"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>
