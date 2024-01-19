@@ -90,6 +90,6 @@
 	<!-- Don't check snapshots - "fixing" them breaks them. -->
 	<exclude-pattern>*/tests/**/_snapshots/*</exclude-pattern>
 
-	<!-- Don't check vendort files whose stanrds may be different. -->
+	<!-- Don't check vendor files whose standards may be different. -->
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 </ruleset>
