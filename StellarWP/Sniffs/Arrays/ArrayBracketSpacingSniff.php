@@ -1,5 +1,5 @@
 <?php
-namespace TEC\Sniffs\Arrays;
+namespace StellarWP\Sniffs\Arrays;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;

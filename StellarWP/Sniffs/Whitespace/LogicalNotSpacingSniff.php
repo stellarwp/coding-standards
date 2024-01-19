@@ -1,5 +1,5 @@
 <?php
-namespace TEC\Sniffs\Whitespace;
+namespace StellarWP\Sniffs\Whitespace;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
