@@ -1,9 +1,9 @@
 Coding Standards
 ==================
 
-The Events Calendar standards for PHP CodeSniffer
+StellarWP standards for PHP CodeSniffer
 
-The Events Calendar coding standards uses a combination of:
+StellarWP coding standards uses a combination of:
 * Generic (part of PHP_CodeSniffer)
 * PEAR (part of PHP_CodeSniffer)
 * PSR2 (part of PHP_CodeSniffer)
