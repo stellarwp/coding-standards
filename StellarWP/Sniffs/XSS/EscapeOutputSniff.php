@@ -320,7 +320,7 @@ class EscapeOutputSniff extends Sniff
 				"Expected next thing to be an escaping function (see Codex for 'Data Validation'), not '%s'",
 				$i,
 				'OutputNotEscaped',
-				$this->tokens[ $i ]['content']
+				array( $this->tokens[ $i ]['content'] )
 			);
 		}
 
