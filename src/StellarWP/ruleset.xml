@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="MAD">
-    <description>Coding standards for MAD packages.</description>
+<ruleset name="StellarWP">
+    <description>Coding standards for StellarWP packages.</description>
 
     <!-- Enables parallel processing when available for faster results. -->
     <arg name="parallel" value="8"/>

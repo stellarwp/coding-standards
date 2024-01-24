@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+root_dir="$(cd "$(dirname "$0")/../" || exit 2; pwd -P)"
+src="${root_dir}/stubs/php-cs-fixer.php"
+destination="${PWD}/.php-cs-fixer.dist.php"
+
+if [[ -f "$destination" ]]; then
+    echo -e "\033[0;33mDestination file ${destination} already exists!\033[0;0m"
+    exit 1
+fi
+
+cp "$src" "$destination" \
+    && echo -e "\033[0;32mCopied template to ${destination}!\033[0;0m"

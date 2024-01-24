@@ -1,56 +1,43 @@
 {
     "name": "stellarwp/coding-standards",
-    "description": "Code sniffing rules for StellarWP",
-    "type": "phpcodesniffer-standard",
-    "license": "GPL-3.0+",
-    "keywords": [
-        "phpcs",
-        "standards",
-        "WordPress"
-    ],
+    "description": "Centralized coding standards for StellarWP packages",
+    "type" : "phpcodesniffer-standard",
+    "license": "MIT",
     "authors": [
         {
             "name": "StellarWP",
-            "email": "vendors@stellarwp.com"
-        },
-        {
-            "name": "Matthew Batchelder",
-            "email": "borkweb@gmail.com"
+            "homepage": "https://stellarwp.com"
         }
     ],
+    "support": {
+        "issues": "https://github.com/stellarwp/coding-standards/issues",
+        "source": "https://github.com/stellarwp/coding-standards"
+    },
+    "minimum-stability": "stable",
     "require": {
-        "automattic/vipwpcs": "^3.0",
-        "php": ">=7.4",
-        "slevomat/coding-standard": "^8.14.0",
-        "squizlabs/php_codesniffer": "^3.8.0",
-        "wp-coding-standards/wpcs": "^3.0.0"
+        "php": "^5.6 | ^7.0 | ^8.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "friendsofphp/php-cs-fixer": "^3.5",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "wp-coding-standards/wpcs": "^2.3"
     },
     "require-dev": {
-        "dealerdirect/phpcodesniffer-composer-installer": "*",
-        "phpcompatibility/php-compatibility": "^9"
+        "assertwell/shellcheck": "^1.0"
     },
-    "suggest": {
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7 || This Composer plugin will sort out the PHPCS 'installed_paths' automatically."
-    },
+    "bin": [
+        "bin/make-php-cs-fixer-config",
+        "bin/make-phpcs-config"
+    ],
     "scripts": {
-        "install-codestandards": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
-        "ruleset": "bin/ruleset-tests",
-        "lint": [
-            "bin/php-lint",
-            "bin/xml-lint"
-        ],
-        "phpcs": "bin/phpcs",
-        "phpunit": "bin/unit-tests",
         "test": [
-            "@lint",
-            "@ruleset",
-            "@phpunit",
-            "@phpcs"
+            "phpcs --standard=./stubs/phpcs.xml --cache src/ stubs/",
+            "php-cs-fixer fix --config=./src/php-cs-fixer.php -v --diff --dry-run",
+            "vendor/bin/shellcheck bin/*"
         ]
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
