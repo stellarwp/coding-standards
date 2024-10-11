@@ -56,6 +56,13 @@
 	<!-- Checks for usage of "$this" in static methods, which will cause runtime errors. -->
 	<rule ref="Squiz.Scope.StaticThisUsage"/>
 
+	<!-- Makes sure to skip checking for docblock when inheritDoc is used. -->
+	<rule ref="Squiz.Commenting.FunctionComment">
+		<properties>
+			<property name="skipIfInheritdoc" value="true"/>
+		</properties>
+	</rule>
+	
 	<!-- We always want short array syntax only. -->
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax" />
 
