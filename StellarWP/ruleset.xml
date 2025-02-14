@@ -91,6 +91,9 @@
 	<rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
 	<rule ref="SlevomatCodingStandard.Variables.UselessVariable"/>
 
+	<!-- Check for proper spacing in comment tags -->
+	<rule ref="StellarWP.Whitespace.DocCommentSpacing"/>
+
 	<!-- Don't check test-generated files. -->
 	<exclude-pattern>*/tests/_support/_generated/*</exclude-pattern>
 
