@@ -15,13 +15,13 @@ final class DocCommentSpacingSniff implements Sniff {
 		return [ T_DOC_COMMENT_TAG ];
 	}
 
-	public function process(File $phpcsFile, $stackPtr) {
+	public function process( File $phpcsFile, $stackPtr ) {
 		$tokens   = $phpcsFile->getTokens();
 		$full_tag = $tokens[ $stackPtr ]['content'];
 
 		// Check if @since or @version is missing space.
 		if ( preg_match( '/@(?:since|version)(\S+)/', $full_tag, $matches, PREG_OFFSET_CAPTURE ) ) {
-			$error = 'There should be exactly one space after the %s tag.';
+			$error   = 'There should be exactly one space after the %s tag.';
 			$version = $matches[1][0];
 			$tag     = strstr( $full_tag, $version, true );
 			$data    = [ $tag ];
@@ -33,7 +33,7 @@ final class DocCommentSpacingSniff implements Sniff {
 		}
 
 		// Check for the extra whitespace after @since or @version.
-		$next_token = $tokens[$stackPtr+1];
+		$next_token = $tokens[ $stackPtr + 1 ];
 
 		if ( $next_token["type"] !== "T_DOC_COMMENT_WHITESPACE" ) {
 			return;
@@ -44,15 +44,15 @@ final class DocCommentSpacingSniff implements Sniff {
 		// Check if @since or @version is followed by more than one space
 		if ( strlen( $whitespace ) > 1 ) {
 			$error = 'There should be exactly one space after the %s tag, not multiple.';
-			$fix   = $phpcsFile->addFixableError($error, $stackPtr, 'ExtraSpaces', $full_tag);
+			$fix   = $phpcsFile->addFixableError( $error, $stackPtr, 'ExtraSpaces', $full_tag );
 		}
 	}
 
-	private function fixSpacing(File $phpcsFile, $stackPtr, $tag, $version) {
-		$correctedComment = sprintf('%s %s', $tag, $version);
+	private function fixSpacing( File $phpcsFile, $stackPtr, $tag, $version ) {
+		$correctedComment = sprintf( '%s %s', $tag, $version );
 
 		$phpcsFile->fixer->beginChangeset();
-		$phpcsFile->fixer->replaceToken($stackPtr, $correctedComment);
+		$phpcsFile->fixer->replaceToken( $stackPtr, $correctedComment );
 		$phpcsFile->fixer->endChangeset();
 	}
 }
