@@ -45,6 +45,10 @@ final class DocCommentSpacingSniff implements Sniff {
 		if ( strlen( $whitespace ) > 1 ) {
 			$error = 'There should be exactly one space after the %s tag, not multiple.';
 			$fix   = $phpcsFile->addFixableError( $error, $stackPtr, 'ExtraSpaces', $full_tag );
+
+			if ( $fix ) {
+				$this->fixMultipleSpaces( $phpcsFile, $stackPtr + 1 );
+			}
 		}
 	}
 
@@ -53,6 +57,12 @@ final class DocCommentSpacingSniff implements Sniff {
 
 		$phpcsFile->fixer->beginChangeset();
 		$phpcsFile->fixer->replaceToken( $stackPtr, $correctedComment );
+		$phpcsFile->fixer->endChangeset();
+	}
+
+	private function fixMultipleSpaces( File $phpcsFile, $stackPtr ) {
+		$phpcsFile->fixer->beginChangeset();
+		$phpcsFile->fixer->replaceToken( $stackPtr, " " );
 		$phpcsFile->fixer->endChangeset();
 	}
 }
