@@ -11,10 +11,21 @@ use PHP_CodeSniffer\Files\File;
  * @package StellarWP\Sniffs\Whitespace
  */
 final class DocCommentSpacingSniff implements Sniff {
+	/**
+	 * Register the sniff.
+	 *
+	 * @return array<string>
+	 */
 	public function register() {
 		return [ T_DOC_COMMENT_TAG ];
 	}
 
+	/**
+	 * Process the doc comment.
+	 *
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int  $stackPtr  The position of the current token in the stack.
+	 */
 	public function process( File $phpcsFile, $stackPtr ) {
 		$tokens   = $phpcsFile->getTokens();
 		$full_tag = $tokens[ $stackPtr ]['content'];
@@ -52,6 +63,14 @@ final class DocCommentSpacingSniff implements Sniff {
 		}
 	}
 
+	/**
+	 * Fix the spacing issue in the doc comment.
+	 *
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int  $stackPtr  The position of the current token in the stack.
+	 * @param string $tag     The tag name.
+	 * @param string $version The version number.
+	 */
 	private function fixSpacing( File $phpcsFile, $stackPtr, $tag, $version ) {
 		$correctedComment = sprintf( '%s %s', $tag, $version );
 
@@ -60,6 +79,12 @@ final class DocCommentSpacingSniff implements Sniff {
 		$phpcsFile->fixer->endChangeset();
 	}
 
+	/**
+	 * Fix the multiple space trails in the doc comment.
+	 *
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int  $stackPtr  The position of the current token in the stack.
+	 */
 	private function fixMultipleSpaces( File $phpcsFile, $stackPtr ) {
 		$phpcsFile->fixer->beginChangeset();
 		$phpcsFile->fixer->replaceToken( $stackPtr, " " );
