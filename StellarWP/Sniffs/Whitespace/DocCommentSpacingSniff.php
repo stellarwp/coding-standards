@@ -31,6 +31,21 @@ final class DocCommentSpacingSniff implements Sniff {
 				$this->fixSpacing( $phpcsFile, $stackPtr, $tag, $version );
 			}
 		}
+
+		// Check for the extra whitespace after @since or @version.
+		$next_token = $tokens[$stackPtr+1];
+
+		if ( $next_token["type"] !== "T_DOC_COMMENT_WHITESPACE" ) {
+			return;
+		}
+
+		$whitespace = $next_token['content'];
+
+		// Check if @since or @version is followed by more than one space
+		if ( strlen( $whitespace ) > 1 ) {
+			$error = 'There should be exactly one space after the %s tag, not multiple.';
+			$fix   = $phpcsFile->addFixableError($error, $stackPtr, 'ExtraSpaces', $full_tag);
+		}
 	}
 
 	private function fixSpacing(File $phpcsFile, $stackPtr, $tag, $version) {
