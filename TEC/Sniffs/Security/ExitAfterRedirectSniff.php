@@ -6,7 +6,7 @@
  * @since TBD
  */
 
-namespace StellarWP\Sniffs\Security;
+namespace TEC\Sniffs\Security;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
@@ -100,9 +100,11 @@ class ExitAfterRedirectSniff implements Sniff {
 					$token_content = isset( $tokens[ $i ]['content'] ) ? strtolower( $tokens[ $i ]['content'] ) : '';
 					
 					// Check for exit, die, or return statements
-					if ( $token_code === T_EXIT || 
-						 ( $token_code === T_STRING && in_array( $token_content, [ 'die', 'tribe_exit', 'tec_exit' ], true ) ) || 
-						 $token_code === T_RETURN ) {
+					if (
+						$token_code === T_EXIT  
+						|| ( $token_code === T_STRING && in_array( $token_content, [ 'die', 'tribe_exit', 'tec_exit' ], true ) )
+						|| $token_code === T_RETURN
+					) {
 						$exit_found = true;
 						break;
 					}

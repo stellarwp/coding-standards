@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="TEC" namespace="TEC" >
+	<description>The Events Calendar Brand coding standards.</description>
+
+	<rule ref="StellarWP"/>
+
+	<!-- Override the ExitAfterRedirect rule with our custom implementation -->
+	<rule ref="WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit">
+		<severity>0</severity>
+	</rule>
+	<rule ref="TEC.Security.ExitAfterRedirect"/>
+</ruleset>
