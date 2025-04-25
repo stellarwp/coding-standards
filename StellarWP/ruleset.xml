@@ -15,6 +15,12 @@
 		<exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
 	</rule>
 
+	<!-- Override the ExitAfterRedirect rule with our custom implementation -->
+	<rule ref="WordPressVIPMinimum.Security.ExitAfterRedirect.NoExit">
+		<severity>0</severity>
+	</rule>
+	<rule ref="StellarWP.Security.ExitAfterRedirect"/>
+
 	<!-- Warns about missing short descriptions in docblocks. -->
 	<rule ref="Generic.Commenting.DocComment">
 		<exclude name="Generic.Commenting.DocComment.MissingShort" />
