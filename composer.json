@@ -16,6 +16,10 @@
         {
             "name": "Matthew Batchelder",
             "email": "borkweb@gmail.com"
+        },
+        {
+            "name": "Gustavo Bordoni",
+            "email": "bordoni.dev@gmail.com"
         }
     ],
     "require": {
