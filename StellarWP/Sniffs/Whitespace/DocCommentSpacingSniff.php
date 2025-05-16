@@ -32,7 +32,7 @@ final class DocCommentSpacingSniff implements Sniff {
 
 		// Check if @since or @version is missing space.
 		if ( preg_match( '/@(?:since|version)(\S+)/', $full_tag, $matches, PREG_OFFSET_CAPTURE ) ) {
-			$error   = 'There should be exactly one space after the %s tag.';
+			$error   = 'There should be exactly one space after the `%s` tag.';
 			$version = $matches[1][0];
 			$tag     = strstr( $full_tag, $version, true );
 			$data    = [ $tag ];
@@ -54,7 +54,7 @@ final class DocCommentSpacingSniff implements Sniff {
 
 		// Check if @since or @version is followed by more than one space
 		if ( strlen( $whitespace ) > 1 ) {
-			$error = 'There should be exactly one space after the %s tag, not multiple.';
+			$error = 'There should be exactly one space after the `%s` tag, not multiple.';
 			$fix   = $phpcsFile->addFixableError( $error, $stackPtr, 'ExtraSpaces', $full_tag );
 
 			if ( $fix ) {
