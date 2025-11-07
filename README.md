@@ -34,7 +34,7 @@ composer global require "sirbrillig/phpcs-variable-analysis:*"
 composer global require "slevomat/coding-standard:^8.14.0"
 
 # Update PHPCS installed paths to include all standards
-phpcs --config-set installed_paths "$(phpcs --config-show | grep installed_paths | awk '{ print $2 }'),${HOME}/.config/composer/vendor/phpcsstandards/phpcsextra,${HOME}/.config/composer/vendor/phpcsstandards/phpcsutils,${HOME}/.config/composer/vendor/wp-coding-standards/wpcs,${HOME}/.composer/vendor/automattic/vipwpcs,${HOME}/.composer/vendor/stellarwp/coding-standards,${HOME}/.composer/vendor/sirbrillig/phpcs-variable-analysis,${HOME}/.composer/vendor/slevomat/coding-standard"
+phpcs --config-set installed_paths "$(phpcs --config-show | grep installed_paths | awk '{ print $2 }'),${HOME}/.composer/vendor/phpcsstandards/phpcsextra,${HOME}/.composer/vendor/phpcsstandards/phpcsutils,${HOME}/.composer/vendor/wp-coding-standards/wpcs,${HOME}/.composer/vendor/automattic/vipwpcs,${HOME}/.composer/vendor/stellarwp/coding-standards,${HOME}/.composer/vendor/sirbrillig/phpcs-variable-analysis,${HOME}/.composer/vendor/slevomat/coding-standard"
 
 # Verify installation
 echo "Installed PHPCS version:"
