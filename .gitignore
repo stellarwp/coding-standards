@@ -4,3 +4,5 @@ phpcs.xml
 .phpcs.xml
 composer.lock
 .DS_Store
+.phpunit.result.cache
+.phpunit.cache/

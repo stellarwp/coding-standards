@@ -1,0 +1,77 @@
+<?php
+
+// phpcs:set StellarWP.Hooks.HookHandlerTypes prefixes[] learndash,ld_,sfwd
+
+class Example {
+
+	public function register() {
+		// Non-first-party filter, same-file method handler (param + return type).
+		add_filter( 'the_content', [ $this, 'filter_content' ] );
+
+		// Non-first-party action, closure with param type and void return (void ok).
+		add_action( 'init', function ( int $x ): void {} );
+
+		// Non-first-party filter, closure with a return type (not allowed).
+		add_filter( 'body_class', function ( array $classes ): array {
+			return $classes;
+		} );
+
+		// First-party filter (matches prefix) - no error.
+		add_filter( 'learndash_something', [ $this, 'filter_content' ] );
+
+		// First-party action - no error even with types.
+		add_action( 'ld_after_save', [ $this, 'typed_action' ] );
+
+		// Non-first-party action handler with param types (method).
+		add_action( 'save_post', [ $this, 'on_save' ] );
+
+		// Non-literal hook name - the sniff skips this (the PHPStan rule catches it).
+		$hook = 'the_content';
+		add_filter( $hook, [ $this, 'filter_content' ] );
+
+		// self::class reference to a static method.
+		add_filter( 'wp_title', [ self::class, 'static_filter' ] );
+
+		// Same-file global-function handler with types - resolved and fixed here.
+		add_filter( 'excerpt_length', 'global_excerpt_handler' );
+
+		// Same-file global-function handler that is already type-less - no error.
+		add_filter( 'get_the_excerpt', 'typeless_excerpt_handler' );
+
+		// First-party hook with a typed global handler - no error.
+		add_filter( 'learndash_excerpt', 'global_excerpt_handler' );
+
+		// Cross-file global-function handler (not defined here) - left to PHPStan.
+		add_filter( 'wp_footer', 'some_cross_file_handler' );
+
+		// Non-first-party action, nullable + by-reference + variadic params.
+		add_action( 'pre_get_posts', function ( ?WP_Query $q, int &$ref, string ...$rest ) {} );
+
+		// Non-first-party filter with the return type on its own line.
+		add_filter( 'the_title', function ( \WP_Post $post )
+			: string
+		{
+			return $post->post_title;
+		} );
+	}
+
+	public function filter_content( string $content ): string {
+		return $content;
+	}
+
+	public function typed_action( int $id ): void {}
+
+	public function on_save( int $post_id, WP_Post $post ): void {}
+
+	public static function static_filter( string $title ): string {
+		return $title;
+	}
+}
+
+function global_excerpt_handler( string $excerpt ): string {
+	return $excerpt;
+}
+
+function typeless_excerpt_handler( $excerpt ) {
+	return $excerpt;
+}
