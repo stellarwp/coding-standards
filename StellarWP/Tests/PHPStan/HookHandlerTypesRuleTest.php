@@ -31,12 +31,15 @@ class HookHandlerTypesRuleTest extends RuleTestCase {
 	}
 
 	public function testRule(): void {
-		// This skip is a limitation of the RuleTestCase harness only: PHPStan's
-		// bundled php-parser hits a token-emulation bug when parsing fixtures on
-		// the PHP 7.4 runtime. The rule itself is PHP 7.4-compatible and runs
-		// correctly under a normal `phpstan analyse` on 7.4.
+		// This skip is a limitation of the RuleTestCase harness only, on the PHP
+		// 7.4 runtime: PHPStan 1.x bundles nikic/php-parser 4.x, whose token
+		// emulation fatals when parsing fixtures under PHP 7.4. PHPStan 2.x bundles
+		// php-parser 5.x, which fixes this - but the projects that consume this
+		// rule are largely still on PHPStan 1.x, so we cannot move to 2.x yet. The
+		// rule itself is PHP 7.4-compatible and runs correctly under a normal
+		// `phpstan analyse` on 7.4.
 		if ( PHP_VERSION_ID < 80000 ) {
-			$this->markTestSkipped( 'Skipped on the PHP 7.4 runtime: PHPStan\'s RuleTestCase php-parser emulation is unreliable here. The rule works on 7.4 under a normal phpstan analyse.' );
+			$this->markTestSkipped( 'Skipped on the PHP 7.4 runtime: PHPStan 1.x\'s bundled php-parser 4.x has a token-emulation bug here. PHPStan 2.x (php-parser 5.x) fixes it, but consumers are still on PHPStan 1.x. The rule works on 7.4 under a normal phpstan analyse.' );
 		}
 
 		$param  = 'hook arguments are not type-guaranteed (a hook can be dispatched with unexpected types, including null), so a native type can cause a fatal error.';
