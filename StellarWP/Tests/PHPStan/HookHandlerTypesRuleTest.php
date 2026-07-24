@@ -95,10 +95,10 @@ class HookHandlerTypesRuleTest extends RuleTestCase {
 				[ 'Handler Wrapper_Subclass::filter_it() for filter "the_content" must not declare a native return type ("string"); ' . $return, 54 ],
 
 				// Hook name narrowing to two constant strings: one error per name.
-				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 62 ],
-				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare a native return type ("string"); ' . $return, 62 ],
-				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_title" must not declare the native type "string" on parameter $content; ' . $param, 62 ],
-				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_title" must not declare a native return type ("string"); ' . $return, 62 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 68 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare a native return type ("string"); ' . $return, 68 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_title" must not declare the native type "string" on parameter $content; ' . $param, 68 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_title" must not declare a native return type ("string"); ' . $return, 68 ],
 			]
 		);
 	}

@@ -57,6 +57,13 @@ $registrar->add_filter( 'the_content', 'filter_it' );
 add_filter( 'wp_footer', 'some_undefined_handler' );
 
 // Hook name that type inference narrows to two constant strings: each resolved
-// name is reported on its own error line.
-$which = rand( 0, 1 ) === 1 ? 'the_content' : 'the_title';
-add_filter( $which, [ $obj, 'filter_method' ] );
+// name is reported on its own error line. A phpdoc literal-string union is used
+// (rather than a stdlib call like rand()) so analysing this fixture pulls in no
+// function stub - a stub can trip php-parser's enum emulation on the PHP 8.0
+// test runtime.
+/**
+ * @param 'the_content'|'the_title' $which
+ */
+function register_conditional_hook( string $which ): void {
+	add_filter( $which, [ Hook_Test_Handlers::class, 'filter_method' ] );
+}
