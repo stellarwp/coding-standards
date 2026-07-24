@@ -49,6 +49,30 @@ class HookHandlerTypesSniff implements Sniff {
 	];
 
 	/**
+	 * Bracket-opening tokens that increase nesting depth when splitting arguments.
+	 *
+	 * @var array<int, int|string>
+	 */
+	private const ARG_OPEN_BRACKETS = [
+		T_OPEN_PARENTHESIS,
+		T_OPEN_SHORT_ARRAY,
+		T_OPEN_SQUARE_BRACKET,
+		T_OPEN_CURLY_BRACKET,
+	];
+
+	/**
+	 * Bracket-closing tokens that decrease nesting depth when splitting arguments.
+	 *
+	 * @var array<int, int|string>
+	 */
+	private const ARG_CLOSE_BRACKETS = [
+		T_CLOSE_PARENTHESIS,
+		T_CLOSE_SHORT_ARRAY,
+		T_CLOSE_SQUARE_BRACKET,
+		T_CLOSE_CURLY_BRACKET,
+	];
+
+	/**
 	 * Whether a native `void` return type is acceptable on action handlers.
 	 *
 	 * Actions always return void, so `: void` is harmless on an action handler.
@@ -219,20 +243,6 @@ class HookHandlerTypesSniff implements Sniff {
 		$tokens = $phpcs_file->getTokens();
 		$args   = [];
 
-		$open_codes = [
-			T_OPEN_PARENTHESIS,
-			T_OPEN_SHORT_ARRAY,
-			T_OPEN_SQUARE_BRACKET,
-			T_OPEN_CURLY_BRACKET,
-		];
-
-		$close_codes = [
-			T_CLOSE_PARENTHESIS,
-			T_CLOSE_SHORT_ARRAY,
-			T_CLOSE_SQUARE_BRACKET,
-			T_CLOSE_CURLY_BRACKET,
-		];
-
 		$start = $phpcs_file->findNext( Tokens::$emptyTokens, $opener + 1, $closer, true );
 		if ( $start === false ) {
 			return $args;
@@ -244,12 +254,12 @@ class HookHandlerTypesSniff implements Sniff {
 		for ( $i = $start; $i < $closer; $i++ ) {
 			$code = $tokens[ $i ]['code'];
 
-			if ( in_array( $code, $open_codes, true ) ) {
+			if ( in_array( $code, self::ARG_OPEN_BRACKETS, true ) ) {
 				$depth++;
 				continue;
 			}
 
-			if ( in_array( $code, $close_codes, true ) ) {
+			if ( in_array( $code, self::ARG_CLOSE_BRACKETS, true ) ) {
 				$depth--;
 				continue;
 			}
@@ -394,21 +404,35 @@ class HookHandlerTypesSniff implements Sniff {
 				continue;
 			}
 
-			$name_ptr = $phpcs_file->findNext( Tokens::$emptyTokens, $ptr + 1, null, true );
-			if ( $name_ptr !== false && $tokens[ $name_ptr ]['code'] === T_BITWISE_AND ) {
-				$name_ptr = $phpcs_file->findNext( Tokens::$emptyTokens, $name_ptr + 1, null, true );
-			}
-
-			if (
-				$name_ptr !== false
-				&& $tokens[ $name_ptr ]['code'] === T_STRING
-				&& strtolower( $tokens[ $name_ptr ]['content'] ) === $name_lc
-			) {
+			if ( $this->function_name_matches( $phpcs_file, $ptr, $name_lc ) ) {
 				return $ptr;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Whether the function/method declaration at $func_ptr is named $name_lc,
+	 * skipping a leading reference operator (e.g. `function &name()`).
+	 *
+	 * @param File   $phpcs_file The file being scanned.
+	 * @param int    $func_ptr   The T_FUNCTION token position.
+	 * @param string $name_lc    The lowercase name to match.
+	 *
+	 * @return bool
+	 */
+	private function function_name_matches( File $phpcs_file, int $func_ptr, string $name_lc ): bool {
+		$tokens   = $phpcs_file->getTokens();
+		$name_ptr = $phpcs_file->findNext( Tokens::$emptyTokens, $func_ptr + 1, null, true );
+
+		if ( $name_ptr !== false && $tokens[ $name_ptr ]['code'] === T_BITWISE_AND ) {
+			$name_ptr = $phpcs_file->findNext( Tokens::$emptyTokens, $name_ptr + 1, null, true );
+		}
+
+		return $name_ptr !== false
+			&& $tokens[ $name_ptr ]['code'] === T_STRING
+			&& strtolower( $tokens[ $name_ptr ]['content'] ) === $name_lc;
 	}
 
 	/**
@@ -555,16 +579,7 @@ class HookHandlerTypesSniff implements Sniff {
 				continue;
 			}
 
-			$name_ptr = $phpcs_file->findNext( Tokens::$emptyTokens, $i + 1, null, true );
-			if ( $name_ptr !== false && $tokens[ $name_ptr ]['code'] === T_BITWISE_AND ) {
-				$name_ptr = $phpcs_file->findNext( Tokens::$emptyTokens, $name_ptr + 1, null, true );
-			}
-
-			if (
-				$name_ptr !== false
-				&& $tokens[ $name_ptr ]['code'] === T_STRING
-				&& strtolower( $tokens[ $name_ptr ]['content'] ) === $method_lc
-			) {
+			if ( $this->function_name_matches( $phpcs_file, $i, $method_lc ) ) {
 				return $i;
 			}
 		}
@@ -585,7 +600,7 @@ class HookHandlerTypesSniff implements Sniff {
 	 *
 	 * @return void
 	 */
-	private function check_handler_types( File $phpcs_file, int $func_ptr, string $hook_name, bool $is_filter, bool $fixable = true ): void {
+	private function check_handler_types( File $phpcs_file, int $func_ptr, string $hook_name, bool $is_filter, bool $fixable ): void {
 		$hook_type = $is_filter ? 'filter' : 'action';
 		$params    = $phpcs_file->getMethodParameters( $func_ptr );
 

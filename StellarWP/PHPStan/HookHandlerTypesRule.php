@@ -142,7 +142,20 @@ class HookHandlerTypesRule implements Rule {
 			return [];
 		}
 
-		return $this->check_callback( $args[1]->value, $scope, $constant_strings[0]->getValue(), $function === 'add_filter' );
+		// A hook argument usually narrows to a single constant string, but type
+		// inference can yield several (e.g. a value that is one of two constants).
+		// Report each resolved hook name on its own error line so every
+		// registration the call stands in for is named individually.
+		$is_filter = $function === 'add_filter';
+		$errors    = [];
+		foreach ( $constant_strings as $constant_string ) {
+			$errors = array_merge(
+				$errors,
+				$this->check_callback( $args[1]->value, $scope, $constant_string->getValue(), $is_filter )
+			);
+		}
+
+		return $errors;
 	}
 
 	/**
@@ -177,39 +190,39 @@ class HookHandlerTypesRule implements Rule {
 		if ( $hook_strings === [] ) {
 			return [];
 		}
-		$hook = $hook_strings[0]->getValue();
 
-		// The handler method name is the second argument, falling back to the hook
-		// name when it is absent or an empty string. A dynamic second argument
-		// cannot be resolved.
-		$method_names = [];
+		// The handler method name is the second argument. A dynamic second argument
+		// cannot be resolved; an absent or empty one falls back to the hook name.
+		$method_strings = null;
 		if ( isset( $args[1] ) ) {
 			$method_strings = $scope->getType( $args[1]->value )->getConstantStrings();
 			if ( $method_strings === [] ) {
 				return [];
 			}
-
-			foreach ( $method_strings as $method_string ) {
-				$method_names[ $method_string->getValue() === '' ? $hook : $method_string->getValue() ] = true;
-			}
-		} else {
-			$method_names[ $hook ] = true;
 		}
 
-		$class_names = [];
-		foreach ( $scope->getType( $node->var )->getObjectClassReflections() as $class_reflection ) {
-			$class_names[ $class_reflection->getName() ] = true;
-		}
+		$class_names = $this->collect_class_names( $scope->getType( $node->var ) );
+		$is_filter   = $method === 'add_filter';
+		$line        = $node->getStartLine();
 
-		$is_filter = $method === 'add_filter';
-		$errors    = [];
-		foreach ( array_keys( $method_names ) as $method_name ) {
-			foreach ( array_keys( $class_names ) as $class_name ) {
-				$errors = array_merge(
-					$errors,
-					$this->check_class_method( $class_name, $method_name, $hook, $is_filter, $node->getStartLine() )
-				);
+		// Report each resolved hook name on its own error line (see process_wp_call()).
+		$errors = [];
+		foreach ( $hook_strings as $hook_string ) {
+			$hook         = $hook_string->getValue();
+			$method_names = [];
+
+			if ( $method_strings === null ) {
+				$method_names[ $hook ] = true;
+			} else {
+				foreach ( $method_strings as $method_string ) {
+					$method_names[ $method_string->getValue() === '' ? $hook : $method_string->getValue() ] = true;
+				}
 			}
+
+			$errors = array_merge(
+				$errors,
+				$this->check_class_methods( $class_names, array_keys( $method_names ), $hook, $is_filter, $line )
+			);
 		}
 
 		return $errors;
@@ -278,27 +291,14 @@ class HookHandlerTypesRule implements Rule {
 			return [];
 		}
 
-		$class_type = $scope->getType( $args[0]->value );
+		$class_names = $this->collect_class_names( $scope->getType( $args[0]->value ) );
 
-		$class_names = [];
-		foreach ( $class_type->getObjectClassReflections() as $class_reflection ) {
-			$class_names[ $class_reflection->getName() ] = true;
-		}
-		foreach ( $class_type->getConstantStrings() as $constant_string ) {
-			$class_names[ $constant_string->getValue() ] = true;
-		}
-
-		$errors = [];
+		$method_names = [];
 		foreach ( $scope->getType( $args[1]->value )->getConstantStrings() as $method_string ) {
-			foreach ( array_keys( $class_names ) as $class_name ) {
-				$errors = array_merge(
-					$errors,
-					$this->check_class_method( $class_name, $method_string->getValue(), $hook, $is_filter, $callback->getStartLine() )
-				);
-			}
+			$method_names[ $method_string->getValue() ] = true;
 		}
 
-		return $errors;
+		return $this->check_class_methods( $class_names, array_keys( $method_names ), $hook, $is_filter, $callback->getStartLine() );
 	}
 
 	/**
@@ -355,23 +355,56 @@ class HookHandlerTypesRule implements Rule {
 			return [];
 		}
 
-		$method       = $method_value->value;
-		$subject_type = $scope->getType( $callback->items[0]->value );
+		$class_names = $this->collect_class_names( $scope->getType( $callback->items[0]->value ) );
 
+		return $this->check_class_methods( $class_names, [ $method_value->value ], $hook, $is_filter, $callback->getStartLine() );
+	}
+
+	/**
+	 * Collects candidate handler class names from a type: both resolved object
+	 * classes (e.g. `$this` / an instance) and constant strings (e.g.
+	 * `Foo::class` / `'Foo'`), keyed for uniqueness.
+	 *
+	 * @param Type $type The type to inspect.
+	 *
+	 * @return array<string, bool>
+	 */
+	private function collect_class_names( Type $type ): array {
 		$class_names = [];
-		foreach ( $subject_type->getObjectClassReflections() as $class_reflection ) {
+
+		foreach ( $type->getObjectClassReflections() as $class_reflection ) {
 			$class_names[ $class_reflection->getName() ] = true;
 		}
-		foreach ( $subject_type->getConstantStrings() as $constant_string ) {
+
+		foreach ( $type->getConstantStrings() as $constant_string ) {
 			$class_names[ $constant_string->getValue() ] = true;
 		}
 
+		return $class_names;
+	}
+
+	/**
+	 * Checks every (class, method) pair for disallowed native types, collecting
+	 * the resulting errors.
+	 *
+	 * @param array<string, bool> $class_names  Candidate handler class names (keyed set).
+	 * @param array<int, string>  $method_names Candidate handler method names.
+	 * @param string              $hook         The formatted hook label (for messaging).
+	 * @param bool                $is_filter    Whether the hook is a filter.
+	 * @param int                 $line         The line to report the violation on.
+	 *
+	 * @return array<int, RuleError>
+	 */
+	private function check_class_methods( array $class_names, array $method_names, string $hook, bool $is_filter, int $line ): array {
 		$errors = [];
-		foreach ( array_keys( $class_names ) as $class_name ) {
-			$errors = array_merge(
-				$errors,
-				$this->check_class_method( $class_name, $method, $hook, $is_filter, $callback->getStartLine() )
-			);
+
+		foreach ( $method_names as $method_name ) {
+			foreach ( array_keys( $class_names ) as $class_name ) {
+				$errors = array_merge(
+					$errors,
+					$this->check_class_method( $class_name, $method_name, $hook, $is_filter, $line )
+				);
+			}
 		}
 
 		return $errors;
@@ -501,6 +534,18 @@ class HookHandlerTypesRule implements Rule {
 	}
 
 	/**
+	 * Builds the leading handler segment of a message ("Foo::bar() "), or an
+	 * empty string for anonymous handlers (closures/arrow functions).
+	 *
+	 * @param string $handler The handler label (e.g. `Foo::bar()`), or '' for closures.
+	 *
+	 * @return string
+	 */
+	private function handler_prefix( string $handler ): string {
+		return $handler === '' ? '' : $handler . ' ';
+	}
+
+	/**
 	 * Builds a parameter-type violation error.
 	 *
 	 * @param bool   $is_filter  Whether the hook is a filter.
@@ -513,13 +558,12 @@ class HookHandlerTypesRule implements Rule {
 	 * @return RuleError
 	 */
 	private function param_error( bool $is_filter, string $handler, string $hook, string $type, string $param_name, int $line ): RuleError {
-		$where     = $handler === '' ? '' : $handler . ' ';
 		$subject   = $param_name === '' ? 'a parameter' : 'parameter $' . $param_name;
 		$hook_type = $is_filter ? 'filter' : 'action';
 
 		$message = sprintf(
 			'Handler %sfor %s "%s" must not declare the native type "%s" on %s; hook arguments are not type-guaranteed (a hook can be dispatched with unexpected types, including null), so a native type can cause a fatal error.',
-			$where,
+			$this->handler_prefix( $handler ),
 			$hook_type,
 			$hook,
 			$type,
@@ -541,7 +585,7 @@ class HookHandlerTypesRule implements Rule {
 	 * @return RuleError
 	 */
 	private function return_type_error( string $hook, bool $is_filter, string $return_type, int $line, string $handler = '' ): RuleError {
-		$where = $handler === '' ? '' : $handler . ' ';
+		$where = $this->handler_prefix( $handler );
 
 		if ( $is_filter ) {
 			$message = sprintf(

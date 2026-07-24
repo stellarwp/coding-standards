@@ -55,3 +55,8 @@ $registrar->add_filter( 'the_content', 'filter_it' );
 
 // Unknown/undefined global function - skipped.
 add_filter( 'wp_footer', 'some_undefined_handler' );
+
+// Hook name that type inference narrows to two constant strings: each resolved
+// name is reported on its own error line.
+$which = rand( 0, 1 ) === 1 ? 'the_content' : 'the_title';
+add_filter( $which, [ $obj, 'filter_method' ] );

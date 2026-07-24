@@ -143,6 +143,11 @@ configuration. Enable just this sniff with:
 An optional `allow_void_return_on_actions` property (default `true`) controls
 whether a native `void` return type is permitted on action handlers.
 
+A second optional property, `warn_on_dynamic_hook_names` (default `false`),
+emits a warning when a hook name cannot be resolved to a literal string, so the
+handler's types could not be verified by the sniff. Leave it off to stay quiet
+about the cross-file and dynamic cases the PHPStan rule already covers.
+
 #### Wrapper handlers are reported but not auto-fixed
 
 Handlers registered through a `$this->add_action( 'tag', 'method' )` wrapper (for

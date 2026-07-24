@@ -93,6 +93,12 @@ class HookHandlerTypesRuleTest extends RuleTestCase {
 				[ 'Handler Wrapper_Subclass::on_save() for action "save_post" must not declare the native type "int" on parameter $post_id; ' . $param, 53 ],
 				[ 'Handler Wrapper_Subclass::filter_it() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 54 ],
 				[ 'Handler Wrapper_Subclass::filter_it() for filter "the_content" must not declare a native return type ("string"); ' . $return, 54 ],
+
+				// Hook name narrowing to two constant strings: one error per name.
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 62 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare a native return type ("string"); ' . $return, 62 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_title" must not declare the native type "string" on parameter $content; ' . $param, 62 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_title" must not declare a native return type ("string"); ' . $return, 62 ],
 			]
 		);
 	}
