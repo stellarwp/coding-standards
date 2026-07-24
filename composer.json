@@ -55,7 +55,7 @@
         "install-codestandards": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
         "ruleset": "vendor/bin/phpcs --standard=StellarWP -e",
         "phpcs": "bin/phpcs",
-        "phpunit": "vendor/bin/phpunit",
+        "phpunit": "vendor/bin/phpunit --testdox",
         "test": [
             "@ruleset",
             "@phpunit"
