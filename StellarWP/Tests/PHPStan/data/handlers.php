@@ -41,6 +41,26 @@ class Fake_Container {
 	}
 }
 
+class Fake_Registrar {
+
+	public function add_action( $tag, $method = '', $priority = 10, $accepted_args = 1 ) {
+		add_action( $tag, array( $this, '' === $method ? $tag : $method ), $priority, $accepted_args );
+	}
+
+	public function add_filter( $tag, $method = '', $priority = 10, $accepted_args = 1 ) {
+		add_filter( $tag, array( $this, '' === $method ? $tag : $method ), $priority, $accepted_args );
+	}
+}
+
+class Wrapper_Subclass extends Fake_Registrar {
+
+	public function on_save( int $post_id ): void {}
+
+	public function filter_it( string $content ): string {
+		return $content;
+	}
+}
+
 function global_filter( string $length ): string {
 	return $length;
 }

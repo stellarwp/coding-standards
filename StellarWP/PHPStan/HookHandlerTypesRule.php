@@ -17,8 +17,10 @@
  * across files, it catches the cases the sniff cannot: a handler whose
  * declaration lives in a different file from the add_action()/add_filter() call,
  * hook names that are not literal strings but which type inference can narrow to
- * constant string(s), and container callbacks
- * (`$container->callback( Class::class, 'method' )`).
+ * constant string(s), container callbacks
+ * (`$container->callback( Class::class, 'method' )`), and hook-registration
+ * wrapper methods (`$receiver->add_action( 'tag', 'method' )`, where the second
+ * argument is a method on the receiver).
  *
  * @package StellarWP\CodingStandards
  */
@@ -28,6 +30,7 @@ namespace StellarWP\PHPStan;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ArrowFunction;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\CallLike;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
@@ -46,7 +49,7 @@ use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
 
 /**
- * @implements Rule<FuncCall>
+ * @implements Rule<CallLike>
  */
 class HookHandlerTypesRule implements Rule {
 
@@ -72,15 +75,35 @@ class HookHandlerTypesRule implements Rule {
 	}
 
 	public function getNodeType(): string {
-		return FuncCall::class;
+		return CallLike::class;
 	}
 
 	/**
-	 * @param FuncCall $node
-	 *
 	 * @return array<int, \PHPStan\Rules\RuleError>
 	 */
 	public function processNode( Node $node, Scope $scope ): array {
+		// WordPress add_action()/add_filter() calls.
+		if ( $node instanceof FuncCall ) {
+			return $this->process_wp_call( $node, $scope );
+		}
+
+		// Wrapper methods that forward to add_action()/add_filter(), where the
+		// second argument is the name of a method on the receiver, resolved to
+		// [ $receiver, 'method' ] (e.g. memberdash's MS_Hooker:
+		// $this->add_action( 'tag', 'method' )).
+		if ( $node instanceof MethodCall ) {
+			return $this->process_wrapper_call( $node, $scope );
+		}
+
+		return [];
+	}
+
+	/**
+	 * Handles a WordPress add_action()/add_filter() function call.
+	 *
+	 * @return array<int, \PHPStan\Rules\RuleError>
+	 */
+	private function process_wp_call( FuncCall $node, Scope $scope ): array {
 		if ( ! $node->name instanceof Name ) {
 			return [];
 		}
@@ -104,6 +127,73 @@ class HookHandlerTypesRule implements Rule {
 		}
 
 		return $this->check_callback( $args[1]->value, $scope, $constant_strings[0]->getValue(), $function === 'add_filter' );
+	}
+
+	/**
+	 * Handles a hook-registration wrapper method: `$receiver->add_action( 'tag',
+	 * 'method' )` / `->add_filter( ... )` whose second argument is the name of a
+	 * method on the receiver (the handler is [ $receiver, 'method' ]; when the
+	 * second argument is absent or empty the hook name is used as the method
+	 * name). Only acts when that method actually exists on the receiver, so an
+	 * unrelated method named add_action()/add_filter() is ignored.
+	 *
+	 * @return array<int, \PHPStan\Rules\RuleError>
+	 */
+	private function process_wrapper_call( MethodCall $node, Scope $scope ): array {
+		if ( ! $node->name instanceof Node\Identifier ) {
+			return [];
+		}
+
+		$method = strtolower( $node->name->name );
+		if ( $method !== 'add_action' && $method !== 'add_filter' ) {
+			return [];
+		}
+
+		$args = $node->getArgs();
+		if ( $args === [] ) {
+			return [];
+		}
+
+		$hook_strings = $scope->getType( $args[0]->value )->getConstantStrings();
+		if ( $hook_strings === [] ) {
+			return [];
+		}
+		$hook = $hook_strings[0]->getValue();
+
+		// The handler method name is the second argument, falling back to the hook
+		// name when it is absent or an empty string. A dynamic second argument
+		// cannot be resolved.
+		$method_names = [];
+		if ( isset( $args[1] ) ) {
+			$method_strings = $scope->getType( $args[1]->value )->getConstantStrings();
+			if ( $method_strings === [] ) {
+				return [];
+			}
+
+			foreach ( $method_strings as $method_string ) {
+				$method_names[ $method_string->getValue() === '' ? $hook : $method_string->getValue() ] = true;
+			}
+		} else {
+			$method_names[ $hook ] = true;
+		}
+
+		$class_names = [];
+		foreach ( $scope->getType( $node->var )->getObjectClassReflections() as $class_reflection ) {
+			$class_names[ $class_reflection->getName() ] = true;
+		}
+
+		$is_filter = $method === 'add_filter';
+		$errors    = [];
+		foreach ( array_keys( $method_names ) as $method_name ) {
+			foreach ( array_keys( $class_names ) as $class_name ) {
+				$errors = array_merge(
+					$errors,
+					$this->check_class_method( $class_name, $method_name, $hook, $is_filter, $node->getStartLine() )
+				);
+			}
+		}
+
+		return $errors;
 	}
 
 	/**

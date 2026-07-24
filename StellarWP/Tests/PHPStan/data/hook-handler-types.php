@@ -47,5 +47,11 @@ add_filter( $hook, [ $obj, 'filter_method' ] );
 $container = new Fake_Container();
 add_filter( 'render_block', $container->callback( Hook_Test_Handlers::class, 'container_handler' ) );
 
+// Hook-registration wrapper methods ($receiver->add_action( 'tag', 'method' ))
+// where the second argument is a method name on the receiver.
+$registrar = new Wrapper_Subclass();
+$registrar->add_action( 'save_post', 'on_save' );
+$registrar->add_filter( 'the_content', 'filter_it' );
+
 // Unknown/undefined global function - skipped.
 add_filter( 'wp_footer', 'some_undefined_handler' );

@@ -85,6 +85,11 @@ class HookHandlerTypesRuleTest extends RuleTestCase {
 				// Container callback: $container->callback( Class::class, 'method' ).
 				[ 'Handler Hook_Test_Handlers::container_handler() for filter "render_block" must not declare the native type "int" on parameter $value; ' . $param, 48 ],
 				[ 'Handler Hook_Test_Handlers::container_handler() for filter "render_block" must not declare a native return type ("int"); ' . $return, 48 ],
+
+				// Wrapper method: $receiver->add_action( 'tag', 'method' ).
+				[ 'Handler Wrapper_Subclass::on_save() for action "save_post" must not declare the native type "int" on parameter $post_id; ' . $param, 53 ],
+				[ 'Handler Wrapper_Subclass::filter_it() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 54 ],
+				[ 'Handler Wrapper_Subclass::filter_it() for filter "the_content" must not declare a native return type ("string"); ' . $return, 54 ],
 			]
 		);
 	}
