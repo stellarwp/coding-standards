@@ -91,6 +91,35 @@ tools, following the hook type:
 - **Action handlers:** no native type on **any** parameter; a native `void`
   return type is allowed (actions always return void).
 
+Removing the native types does **not** remove the need for type safety - it moves
+that responsibility into the callback. Native types gave you a guarantee the
+handler could rely on; since that guarantee is not safe here, the handler has to
+provide it itself. Validate the incoming arguments (and, for filters, the value
+you return) at the top of the handler before using them.
+
+Check the type before you use it - do not simply cast. A blind cast is not safe:
+`$value` could be an object or array, and `(string) $value` would mangle it or
+fatal. Use a scalar/type check (`is_string()`, `is_numeric()`, `is_scalar()`, ...)
+and handle the unexpected case. For a filter, return the value unchanged when it
+is not something you can handle, so the chain is preserved:
+
+```php
+// Do not rely on the signature to guarantee the types:
+//   public function filter_the_value( string $value, int $post_id ): string
+public function filter_the_value( $value, $post_id ) {
+    // A cast alone is unsafe - $value could be an object or array.
+    if ( ! is_string( $value ) ) {
+        return $value; // not something we handle: pass it through unchanged.
+    }
+
+    $post_id = is_numeric( $post_id ) ? (int) $post_id : 0;
+
+    // ... $value is a string and $post_id is an int now.
+
+    return $value;
+}
+```
+
 | | PHPCS sniff (`StellarWP.Hooks.HookHandlerTypes`) | PHPStan rule |
 |---|---|---|
 | Runs in | phpcs (fast, in-editor) | phpstan (whole codebase, never diff-limited) |
