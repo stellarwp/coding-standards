@@ -9,39 +9,38 @@
 
 $obj = new Hook_Test_Handlers();
 
-// Non-first-party filter, cross-file method: param + return.
-add_filter( 'the_content', [ $obj, 'np_filter' ] );
+// Filter, cross-file method: param + return.
+add_filter( 'the_content', [ $obj, 'filter_method' ] );
 
-// Non-first-party action, cross-file method: two params; void return allowed.
-add_action( 'save_post', [ $obj, 'np_action' ] );
+// Action, cross-file method: two params; void return allowed.
+add_action( 'save_post', [ $obj, 'action_method' ] );
 
-// First-party filter, cross-file method: all three params + return (a context
-// argument such as the user id can be dispatched as null by core).
-add_filter( 'learndash_has_access', [ $obj, 'fp_filter' ] );
+// Filter with several context arguments, cross-file method: all params + return.
+add_filter( 'user_has_cap', [ $obj, 'filter_context_method' ] );
 
-// First-party action, cross-file method: unrestricted - no error.
-add_action( 'learndash_after_save', [ $obj, 'fp_action' ] );
+// Action with a typed param, cross-file method: the param is flagged (void ok).
+add_action( 'transition_post_status', [ $obj, 'action_typed' ] );
 
-// First-party filter, string class reference to a static method: param + return.
-add_filter( 'sfwd_lms_has_access', [ 'Hook_Test_Handlers', 'fp_static_filter' ] );
+// Filter, string class reference to a static method: param + return.
+add_filter( 'wp_title', [ 'Hook_Test_Handlers', 'static_filter' ] );
 
-// Non-first-party action, closure: param; void return allowed.
+// Action closure: param; void return allowed.
 add_action( 'init', function ( int $x ): void {} );
 
-// First-party filter, closure: two params + return.
-add_filter( 'ld_valid', function ( bool $valid, int $id ): bool {
+// Filter closure: two params + return.
+add_filter( 'login_redirect', function ( bool $valid, int $id ): bool {
 	return $valid;
 } );
 
-// Non-first-party filter, global function: param + return.
-add_filter( 'excerpt_length', 'np_global_filter' );
+// Filter, global function: param + return.
+add_filter( 'excerpt_length', 'global_filter' );
 
 // Already type-less global function - no error.
 add_filter( 'get_the_excerpt', 'typeless_global_filter' );
 
-// Non-literal hook name resolved by inference to a non-first-party filter.
+// Non-literal hook name resolved by inference to a filter.
 $hook = 'the_content';
-add_filter( $hook, [ $obj, 'np_filter' ] );
+add_filter( $hook, [ $obj, 'filter_method' ] );
 
 // Unknown/undefined global function - skipped.
 add_filter( 'wp_footer', 'some_undefined_handler' );

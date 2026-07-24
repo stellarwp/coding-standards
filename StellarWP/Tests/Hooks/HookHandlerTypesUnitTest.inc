@@ -1,70 +1,67 @@
 <?php
 
-// phpcs:set StellarWP.Hooks.HookHandlerTypes prefixes[] learndash,ld_,sfwd
-
 class Example {
 
 	public function register() {
-		// Non-first-party filter: all params + return must be type-less.
-		add_filter( 'the_content', [ $this, 'np_filter' ] );
+		// Filter, same-file method: every param + the return type must go.
+		add_filter( 'the_content', [ $this, 'filter_method' ] );
 
-		// Non-first-party action: params must be type-less; void return is allowed.
-		add_action( 'save_post', [ $this, 'np_action' ] );
+		// Action, same-file method: params must go; a void return is allowed.
+		add_action( 'save_post', [ $this, 'action_method' ] );
 
-		// First-party filter: all params + return must be type-less, including the
-		// context arguments (core can dispatch e.g. a null user id).
-		add_filter( 'learndash_has_access', [ $this, 'fp_filter' ] );
+		// Filter with several context arguments: all of them must go.
+		add_filter( 'user_has_cap', [ $this, 'filter_context_method' ] );
 
-		// First-party action: unrestricted - no errors.
-		add_action( 'learndash_after_save', [ $this, 'fp_action' ] );
+		// Action with a typed param: the param must go (void return is allowed).
+		add_action( 'transition_post_status', [ $this, 'action_typed' ] );
 
-		// Non-first-party action, closure: param flagged, void return allowed.
+		// Action closure: param flagged, void return allowed.
 		add_action( 'init', function ( int $x ): void {} );
 
-		// First-party filter, closure: all params + return flagged.
-		add_filter( 'ld_valid', function ( bool $valid, int $id ): bool {
+		// Filter closure: both params + the return type.
+		add_filter( 'login_redirect', function ( bool $valid, int $id ): bool {
 			return $valid;
 		} );
 
-		// Non-first-party action closure with nullable / by-reference / variadic.
+		// Action closure with nullable / by-reference / variadic params.
 		add_action( 'pre_get_posts', function ( ?WP_Query $q, int &$ref, string ...$rest ) {} );
 
-		// self::class static handler on a first-party filter.
-		add_filter( 'sfwd_lms_has_access', [ self::class, 'fp_static_filter' ] );
+		// Filter via self::class static handler.
+		add_filter( 'wp_title', [ self::class, 'static_filter' ] );
 
-		// Old-style [ &$this, 'method' ] reference on a non-first-party action.
-		add_action( 'wp_mail_failed', [ &$this, 'np_ref_action' ] );
+		// Action via the old-style [ &$this, 'method' ] reference.
+		add_action( 'wp_mail_failed', [ &$this, 'ref_action' ] );
 
-		// Same-file global-function handler on a non-first-party filter.
-		add_filter( 'excerpt_length', 'np_global_filter' );
+		// Filter via a same-file global-function handler.
+		add_filter( 'excerpt_length', 'global_filter' );
 
 		// Dynamic hook name - skipped by the sniff (the PHPStan rule catches it).
 		$hook = 'the_content';
-		add_filter( $hook, [ $this, 'np_filter' ] );
+		add_filter( $hook, [ $this, 'filter_method' ] );
 
 		// Cross-file callback - left to the PHPStan rule.
-		add_filter( 'wp_title', 'some_cross_file_handler' );
+		add_filter( 'get_the_excerpt', 'some_cross_file_handler' );
 	}
 
-	public function np_filter( string $content ): string {
+	public function filter_method( string $content ): string {
 		return $content;
 	}
 
-	public function np_action( int $post_id, WP_Post $post ): void {}
+	public function action_method( int $post_id, WP_Post $post ): void {}
 
-	public function fp_filter( bool $has_access, int $post_id, int $user_id ): bool {
+	public function filter_context_method( bool $has_access, int $post_id, int $user_id ): bool {
 		return $has_access;
 	}
 
-	public function fp_action( int $id ): void {}
+	public function action_typed( int $id ): void {}
 
-	public function np_ref_action( \WP_Error $error ) {}
+	public function ref_action( \WP_Error $error ) {}
 
-	public static function fp_static_filter( string $title ): string {
+	public static function static_filter( string $title ): string {
 		return $title;
 	}
 }
 
-function np_global_filter( string $length ): string {
+function global_filter( string $length ): string {
 	return $length;
 }

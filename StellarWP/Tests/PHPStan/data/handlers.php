@@ -13,24 +13,24 @@ class WP_Query {}
 
 class Hook_Test_Handlers {
 
-	public function np_filter( string $content ): string {
+	public function filter_method( string $content ): string {
 		return $content;
 	}
 
-	public function np_action( int $post_id, WP_Post $post ): void {}
+	public function action_method( int $post_id, WP_Post $post ): void {}
 
-	public function fp_filter( bool $has_access, int $post_id, int $user_id ): bool {
+	public function filter_context_method( bool $has_access, int $post_id, int $user_id ): bool {
 		return $has_access;
 	}
 
-	public function fp_action( int $id ): void {}
+	public function action_typed( int $id ): void {}
 
-	public static function fp_static_filter( string $title ): string {
+	public static function static_filter( string $title ): string {
 		return $title;
 	}
 }
 
-function np_global_filter( string $length ): string {
+function global_filter( string $length ): string {
 	return $length;
 }
 

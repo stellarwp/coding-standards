@@ -1,14 +1,11 @@
 parameters:
-	# Prefixes that identify first-party hooks. Mirror the project's
-	# WordPress.NamingConventions.PrefixAllGlobals "prefixes" value. When empty,
-	# the rule does nothing (a safe default that also makes "unconfigured" obvious).
 	stellarwpHookHandlerTypes:
-		prefixes: []
+		# Actions always return void, so a native `void` return type is allowed on
+		# action handlers. Set to false to forbid it too.
 		allowVoidReturnOnActions: true
 
 parametersSchema:
 	stellarwpHookHandlerTypes: structure([
-		prefixes: listOf(string())
 		allowVoidReturnOnActions: bool()
 	])
 
@@ -16,7 +13,6 @@ services:
 	-
 		class: StellarWP\PHPStan\HookHandlerTypesRule
 		arguments:
-			prefixes: %stellarwpHookHandlerTypes.prefixes%
 			allow_void_return_on_actions: %stellarwpHookHandlerTypes.allowVoidReturnOnActions%
 		tags:
 			- phpstan.rules.rule

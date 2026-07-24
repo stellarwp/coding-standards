@@ -78,28 +78,18 @@ You can follow [this guide](https://confluence.jetbrains.com/display/PhpStorm/PH
 
 ## Hook handler argument types
 
-WordPress passes hook arguments with no type guarantees and reassigns or discards
-filter return values however it likes. Declaring a **native parameter type** or a
-**native return type** on a handler attached to a hook you do not own (a WP core
-hook, or one defined by another plugin or theme) can therefore cause a runtime
-**fatal** when the value received - or the value the filter chain expects back -
-does not match the declared type. The safe posture is to be type-less on those
-handlers.
+A hook's argument and return types are never guaranteed. Relying on documentation
+that turns out to be inaccurate can lead to the wrong native type, and any third
+party can dispatch one of your hooks via `apply_filters()` / `do_action()` with
+arguments of a different type. Either way, a value that does not match a
+**native parameter type** or a **native return type** declared on the handler
+causes a runtime **fatal**. This standard enforces that with two complementary
+tools, following the hook type:
 
-This standard enforces that rule with two complementary tools. "First-party" is
-determined solely by prefixes you configure, which should mirror your project's
-`WordPress.NamingConventions.PrefixAllGlobals` value. Enforcement follows the hook
-type:
-
-- **Filters (any prefix, first-party or not):** the handler must be fully
-  type-less - no native type on **any** parameter and no native return type. A
-  filter can be dispatched with arguments of unexpected types even by first-party
-  code (LearnDash core calls `apply_filters( 'sfwd_lms_has_access', true, 28, null )`,
-  so a native `int $user_id` throws a `TypeError`), and its return value flows
-  through code you do not control.
-- **Non-first-party actions** (WP core / third-party): no native parameter types;
-  a `void` return type is allowed.
-- **First-party actions:** unrestricted.
+- **Filter handlers:** no native type on **any** parameter and no native return
+  type.
+- **Action handlers:** no native type on **any** parameter; a native `void`
+  return type is allowed (actions always return void).
 
 | | PHPCS sniff (`StellarWP.Hooks.HookHandlerTypes`) | PHPStan rule |
 |---|---|---|
@@ -114,37 +104,22 @@ handlers whose declaration lives in a different file from the `add_filter()` /
 
 ### PHPCS sniff
 
-The sniff is part of the `StellarWP` standard. Configure the `prefixes` property
-(and, optionally, `allow_void_return_on_actions`, default `true`). With no
-prefixes configured the sniff does nothing.
+The sniff is part of the `StellarWP` standard, so referencing it needs no
+configuration. Enable just this sniff with:
 
 ```xml
-<rule ref="StellarWP.Hooks.HookHandlerTypes">
-    <properties>
-        <property name="prefixes" type="array">
-            <element value="my_project"/>
-            <element value="mp_"/>
-        </property>
-    </properties>
-</rule>
+<rule ref="StellarWP.Hooks.HookHandlerTypes"/>
 ```
+
+An optional `allow_void_return_on_actions` property (default `true`) controls
+whether a native `void` return type is permitted on action handlers.
 
 ### PHPStan rule
 
 The rule ships as an auto-discovered PHPStan extension. Projects using
 [`phpstan/extension-installer`](https://github.com/phpstan/extension-installer)
-get it registered automatically - no `includes:` entry needed. You must still set
-the `prefixes` parameter in your `phpstan.neon` (an empty list makes the rule a
-no-op):
-
-```neon
-parameters:
-    stellarwpHookHandlerTypes:
-        prefixes:
-            - my_project
-            - mp_
-        # allowVoidReturnOnActions: true  # optional, default true
-```
+get it registered automatically with **no configuration** - no `includes:` entry
+and no parameters required.
 
 If you are not using `extension-installer`, include the extension manually:
 
@@ -153,9 +128,14 @@ includes:
     - vendor/stellarwp/coding-standards/StellarWP/PHPStan/extension.neon
 ```
 
-> The `prefixes` value now lives in up to three places - `PrefixAllGlobals` in
-> `phpcs.xml`, the sniff's `prefixes`, and the rule's `prefixes` in `phpstan.neon`.
-> There is no shared source both tools can read, so keep them in sync.
+The optional `allowVoidReturnOnActions` parameter (default `true`) mirrors the
+sniff property:
+
+```neon
+parameters:
+    stellarwpHookHandlerTypes:
+        allowVoidReturnOnActions: true
+```
 
 When adopting this in a project with existing violations, regenerate your PHPStan
 baseline to grandfather them, then burn them down over time.

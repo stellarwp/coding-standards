@@ -1,18 +1,16 @@
 <?php
 /**
  * PHPStan rule: forbids native parameter and return types on hook handlers where
- * the argument or return types are not guaranteed. Enforcement mirrors the
+ * the argument or return types are not guaranteed. A hook's types are never
+ * guaranteed - inaccurate documentation can lead to the wrong native type, and
+ * any third party can dispatch one of our hooks via apply_filters()/do_action()
+ * with a different type - so a value that does not match a native type on the
+ * handler causes a runtime fatal. Enforcement mirrors the
  * StellarWP.Hooks.HookHandlerTypes sniff:
  *
- * - Filters (any prefix): the handler must be fully type-less - no native type
- *   on any parameter and no native return type. A filter can be dispatched with
- *   arguments of unexpected types even by first-party code (e.g. core calls
- *   apply_filters( 'sfwd_lms_has_access', true, 28, null ), so a native
- *   `int $user_id` fatals), and its return value flows through code we do not
- *   control.
- * - Non-first-party actions (WP core / third-party): no native parameter types;
- *   a void return type is allowed.
- * - First-party actions: unrestricted.
+ * - Filter handlers: no native type on any parameter and no native return type.
+ * - Action handlers: no native type on any parameter; a native `void` return
+ *   type is allowed (actions always return void).
  *
  * This is the whole-codebase companion to the sniff. Because PHPStan analyses the
  * entire codebase (never diff-limited) and resolves callbacks and hook names
@@ -55,14 +53,6 @@ class HookHandlerTypesRule implements Rule {
 	private $reflection_provider;
 
 	/**
-	 * Prefixes that identify first-party hooks. Mirror the project's
-	 * WordPress.NamingConventions.PrefixAllGlobals "prefixes" value.
-	 *
-	 * @var string[]
-	 */
-	private $prefixes;
-
-	/**
 	 * Whether a native `void` return type is acceptable on action handlers.
 	 *
 	 * @var bool
@@ -71,12 +61,10 @@ class HookHandlerTypesRule implements Rule {
 
 	/**
 	 * @param ReflectionProvider $reflection_provider          Provided by PHPStan.
-	 * @param string[]           $prefixes                     First-party hook prefixes.
 	 * @param bool               $allow_void_return_on_actions Allow `: void` on action handlers.
 	 */
-	public function __construct( ReflectionProvider $reflection_provider, array $prefixes, bool $allow_void_return_on_actions = true ) {
+	public function __construct( ReflectionProvider $reflection_provider, bool $allow_void_return_on_actions = true ) {
 		$this->reflection_provider          = $reflection_provider;
-		$this->prefixes                     = $prefixes;
 		$this->allow_void_return_on_actions = $allow_void_return_on_actions;
 	}
 
@@ -90,7 +78,7 @@ class HookHandlerTypesRule implements Rule {
 	 * @return array<int, \PHPStan\Rules\RuleError>
 	 */
 	public function processNode( Node $node, Scope $scope ): array {
-		if ( $this->prefixes === [] || ! $node->name instanceof Name ) {
+		if ( ! $node->name instanceof Name ) {
 			return [];
 		}
 
@@ -104,34 +92,15 @@ class HookHandlerTypesRule implements Rule {
 			return [];
 		}
 
-		// Resolve the hook name(s) via type inference. This covers literals as
-		// well as any expression narrowing to constant string(s).
+		// Resolve the hook name via type inference (used only to name the hook in
+		// the message). This covers literals as well as any expression narrowing
+		// to constant string(s).
 		$constant_strings = $scope->getType( $args[0]->value )->getConstantStrings();
 		if ( $constant_strings === [] ) {
 			return [];
 		}
 
-		$is_filter = $function === 'add_filter';
-
-		$hook            = $constant_strings[0]->getValue();
-		$all_first_party = true;
-		foreach ( $constant_strings as $constant_string ) {
-			if ( ! $this->is_first_party( $constant_string->getValue() ) ) {
-				$hook            = $constant_string->getValue();
-				$all_first_party = false;
-				break;
-			}
-		}
-
-		// First-party actions are unrestricted. Everything else is checked: any
-		// filter (a first-party filter still cannot type its arguments or return -
-		// the value is shaped by other code, and even core dispatches unexpected
-		// types), and non-first-party actions.
-		if ( $all_first_party && ! $is_filter ) {
-			return [];
-		}
-
-		return $this->check_callback( $args[1]->value, $scope, $hook, $is_filter );
+		return $this->check_callback( $args[1]->value, $scope, $constant_strings[0]->getValue(), $function === 'add_filter' );
 	}
 
 	/**
@@ -344,26 +313,18 @@ class HookHandlerTypesRule implements Rule {
 	 * @return \PHPStan\Rules\RuleError
 	 */
 	private function param_error( bool $is_filter, string $handler, string $hook, string $type, string $param_name, int $line ) {
-		$where   = $handler === '' ? '' : $handler . ' ';
-		$subject = $param_name === '' ? 'a parameter' : 'parameter $' . $param_name;
+		$where     = $handler === '' ? '' : $handler . ' ';
+		$subject   = $param_name === '' ? 'a parameter' : 'parameter $' . $param_name;
+		$hook_type = $is_filter ? 'filter' : 'action';
 
-		if ( $is_filter ) {
-			$message = sprintf(
-				'Handler %sfor filter "%s" must not declare the native type "%s" on %s; a filter can be dispatched with arguments of unexpected types (including null), so a native type can cause a fatal error.',
-				$where,
-				$hook,
-				$type,
-				$subject
-			);
-		} else {
-			$message = sprintf(
-				'Handler %sfor non-first-party action "%s" must not declare the native type "%s" on %s; WordPress does not guarantee hook argument types and a native type can cause a fatal error.',
-				$where,
-				$hook,
-				$type,
-				$subject
-			);
-		}
+		$message = sprintf(
+			'Handler %sfor %s "%s" must not declare the native type "%s" on %s; hook arguments are not type-guaranteed (a hook can be dispatched with unexpected types, including null), so a native type can cause a fatal error.',
+			$where,
+			$hook_type,
+			$hook,
+			$type,
+			$subject
+		);
 
 		return RuleErrorBuilder::message( $message )->identifier( 'stellarwp.hookHandlerParamType' )->line( $line )->build();
 	}
@@ -385,7 +346,7 @@ class HookHandlerTypesRule implements Rule {
 			);
 		} else {
 			$message = sprintf(
-				'Handler %sfor non-first-party action "%s" must not declare a native return type ("%s") other than void.',
+				'Handler %sfor action "%s" must not declare a native return type ("%s") other than void.',
 				$where,
 				$hook,
 				$return_type
@@ -402,19 +363,6 @@ class HookHandlerTypesRule implements Rule {
 		return ! $is_filter
 			&& $this->allow_void_return_on_actions
 			&& strtolower( ltrim( $return_type, '?\\' ) ) === 'void';
-	}
-
-	/**
-	 * Whether a hook name belongs to this project by prefix.
-	 */
-	private function is_first_party( string $hook_name ): bool {
-		foreach ( $this->prefixes as $prefix ) {
-			if ( $prefix !== '' && stripos( $hook_name, $prefix ) === 0 ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**

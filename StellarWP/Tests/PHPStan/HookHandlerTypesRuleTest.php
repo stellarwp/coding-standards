@@ -27,11 +27,7 @@ class HookHandlerTypesRuleTest extends RuleTestCase {
 	}
 
 	protected function getRule(): Rule {
-		return new HookHandlerTypesRule(
-			$this->createReflectionProvider(),
-			[ 'learndash', 'ld_', 'sfwd' ],
-			true
-		);
+		return new HookHandlerTypesRule( $this->createReflectionProvider(), true );
 	}
 
 	public function testRule(): void {
@@ -43,46 +39,48 @@ class HookHandlerTypesRuleTest extends RuleTestCase {
 			$this->markTestSkipped( 'Skipped on the PHP 7.4 runtime: PHPStan\'s RuleTestCase php-parser emulation is unreliable here. The rule works on 7.4 under a normal phpstan analyse.' );
 		}
 
-		$filter_param  = 'a filter can be dispatched with arguments of unexpected types (including null), so a native type can cause a fatal error.';
-		$filter_return = 'filter return values are not type-guaranteed and a native return type can cause a fatal error.';
-		$action_param  = 'WordPress does not guarantee hook argument types and a native type can cause a fatal error.';
+		$param  = 'hook arguments are not type-guaranteed (a hook can be dispatched with unexpected types, including null), so a native type can cause a fatal error.';
+		$return = 'filter return values are not type-guaranteed and a native return type can cause a fatal error.';
 
 		$this->analyse(
 			[ __DIR__ . '/data/hook-handler-types.php' ],
 			[
-				// Non-first-party filter, cross-file method.
-				[ 'Handler Hook_Test_Handlers::np_filter() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $filter_param, 13 ],
-				[ 'Handler Hook_Test_Handlers::np_filter() for filter "the_content" must not declare a native return type ("string"); ' . $filter_return, 13 ],
+				// Filter, cross-file method: param + return.
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 13 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare a native return type ("string"); ' . $return, 13 ],
 
-				// Non-first-party action, cross-file method (void return allowed).
-				[ 'Handler Hook_Test_Handlers::np_action() for non-first-party action "save_post" must not declare the native type "int" on parameter $post_id; ' . $action_param, 16 ],
-				[ 'Handler Hook_Test_Handlers::np_action() for non-first-party action "save_post" must not declare the native type "WP_Post" on parameter $post; ' . $action_param, 16 ],
+				// Action, cross-file method: two params (void return allowed).
+				[ 'Handler Hook_Test_Handlers::action_method() for action "save_post" must not declare the native type "int" on parameter $post_id; ' . $param, 16 ],
+				[ 'Handler Hook_Test_Handlers::action_method() for action "save_post" must not declare the native type "WP_Post" on parameter $post; ' . $param, 16 ],
 
-				// First-party filter, cross-file method: every param + return.
-				[ 'Handler Hook_Test_Handlers::fp_filter() for filter "learndash_has_access" must not declare the native type "bool" on parameter $has_access; ' . $filter_param, 20 ],
-				[ 'Handler Hook_Test_Handlers::fp_filter() for filter "learndash_has_access" must not declare the native type "int" on parameter $post_id; ' . $filter_param, 20 ],
-				[ 'Handler Hook_Test_Handlers::fp_filter() for filter "learndash_has_access" must not declare the native type "int" on parameter $user_id; ' . $filter_param, 20 ],
-				[ 'Handler Hook_Test_Handlers::fp_filter() for filter "learndash_has_access" must not declare a native return type ("bool"); ' . $filter_return, 20 ],
+				// Filter with several context arguments: every param + return.
+				[ 'Handler Hook_Test_Handlers::filter_context_method() for filter "user_has_cap" must not declare the native type "bool" on parameter $has_access; ' . $param, 19 ],
+				[ 'Handler Hook_Test_Handlers::filter_context_method() for filter "user_has_cap" must not declare the native type "int" on parameter $post_id; ' . $param, 19 ],
+				[ 'Handler Hook_Test_Handlers::filter_context_method() for filter "user_has_cap" must not declare the native type "int" on parameter $user_id; ' . $param, 19 ],
+				[ 'Handler Hook_Test_Handlers::filter_context_method() for filter "user_has_cap" must not declare a native return type ("bool"); ' . $return, 19 ],
 
-				// First-party filter, string class reference to a static method.
-				[ 'Handler Hook_Test_Handlers::fp_static_filter() for filter "sfwd_lms_has_access" must not declare the native type "string" on parameter $title; ' . $filter_param, 26 ],
-				[ 'Handler Hook_Test_Handlers::fp_static_filter() for filter "sfwd_lms_has_access" must not declare a native return type ("string"); ' . $filter_return, 26 ],
+				// Action with a typed param (void return allowed).
+				[ 'Handler Hook_Test_Handlers::action_typed() for action "transition_post_status" must not declare the native type "int" on parameter $id; ' . $param, 22 ],
 
-				// Non-first-party action, closure (void return allowed).
-				[ 'Handler for non-first-party action "init" must not declare the native type "int" on parameter $x; ' . $action_param, 29 ],
+				// Filter, string class reference to a static method.
+				[ 'Handler Hook_Test_Handlers::static_filter() for filter "wp_title" must not declare the native type "string" on parameter $title; ' . $param, 25 ],
+				[ 'Handler Hook_Test_Handlers::static_filter() for filter "wp_title" must not declare a native return type ("string"); ' . $return, 25 ],
 
-				// First-party filter, closure: both params + return.
-				[ 'Handler for filter "ld_valid" must not declare the native type "bool" on parameter $valid; ' . $filter_param, 32 ],
-				[ 'Handler for filter "ld_valid" must not declare the native type "int" on parameter $id; ' . $filter_param, 32 ],
-				[ 'Handler for filter "ld_valid" must not declare a native return type ("bool"); ' . $filter_return, 32 ],
+				// Action closure (void return allowed).
+				[ 'Handler for action "init" must not declare the native type "int" on parameter $x; ' . $param, 28 ],
 
-				// Non-first-party filter, global function.
-				[ 'Handler np_global_filter() for filter "excerpt_length" must not declare the native type "string" on parameter $length; ' . $filter_param, 37 ],
-				[ 'Handler np_global_filter() for filter "excerpt_length" must not declare a native return type ("string"); ' . $filter_return, 37 ],
+				// Filter closure: both params + return.
+				[ 'Handler for filter "login_redirect" must not declare the native type "bool" on parameter $valid; ' . $param, 31 ],
+				[ 'Handler for filter "login_redirect" must not declare the native type "int" on parameter $id; ' . $param, 31 ],
+				[ 'Handler for filter "login_redirect" must not declare a native return type ("bool"); ' . $return, 31 ],
+
+				// Filter, global function.
+				[ 'Handler global_filter() for filter "excerpt_length" must not declare the native type "string" on parameter $length; ' . $param, 36 ],
+				[ 'Handler global_filter() for filter "excerpt_length" must not declare a native return type ("string"); ' . $return, 36 ],
 
 				// Non-literal hook name resolved by inference.
-				[ 'Handler Hook_Test_Handlers::np_filter() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $filter_param, 44 ],
-				[ 'Handler Hook_Test_Handlers::np_filter() for filter "the_content" must not declare a native return type ("string"); ' . $filter_return, 44 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 43 ],
+				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare a native return type ("string"); ' . $return, 43 ],
 			]
 		);
 	}

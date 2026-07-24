@@ -10,8 +10,7 @@ namespace StellarWP\Tests\Hooks;
 use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
 
 /**
- * The prefixes property is configured via a `// phpcs:set` annotation at the top
- * of the .inc test case file. Expected error lines are keyed to that file.
+ * Expected error lines are keyed to the .inc test case file.
  */
 class HookHandlerTypesUnitTest extends AbstractSniffUnitTest {
 
@@ -22,15 +21,16 @@ class HookHandlerTypesUnitTest extends AbstractSniffUnitTest {
 	 */
 	protected function getErrorList() {
 		return [
-			22 => 1, // init closure (non-first-party action): param; void return allowed.
-			25 => 3, // ld_valid closure (first-party filter): two params + return.
-			30 => 3, // pre_get_posts closure (non-first-party action): nullable, by-ref, variadic.
-			49 => 2, // np_filter() (non-first-party filter): param + return.
-			53 => 2, // np_action() (non-first-party action): two params; void return allowed.
-			55 => 4, // fp_filter() (first-party filter): all three params + return.
-			61 => 1, // np_ref_action() (non-first-party action, via [ &$this, ... ]): param.
-			63 => 2, // fp_static_filter() (first-party filter, via self::class): param + return.
-			68 => 2, // np_global_filter() (non-first-party filter, global function): param + return.
+			19 => 1, // init action closure: param; void return allowed.
+			22 => 3, // ld_valid filter closure: two params + return.
+			27 => 3, // pre_get_posts action closure: nullable, by-ref, variadic params.
+			46 => 2, // filter_method(): param + return.
+			50 => 2, // action_method(): two params; void return allowed.
+			52 => 4, // filter_context_method(): all three params + return.
+			56 => 1, // action_typed(): the native param (an action still forbids param types).
+			58 => 1, // ref_action() (via [ &$this, ... ]): param.
+			60 => 2, // static_filter() (via self::class): param + return.
+			65 => 2, // global_filter() (global function): param + return.
 		];
 	}
 
