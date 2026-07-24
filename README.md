@@ -124,7 +124,7 @@ public function filter_the_value( $value, $post_id ) {
 |---|---|---|
 | Runs in | phpcs (fast, in-editor) | phpstan (whole codebase, never diff-limited) |
 | Covers | same-file handlers only (inline closures/arrows, `[ $this, 'method' ]` / `[ self::class, 'method' ]`, `'function_name'`, and `$this->add_action( 'tag', 'method' )` wrappers) with literal hook names | all callback forms across files (via reflection), including `$container->callback( Class::class, 'method' )` and wrapper methods like `$this->add_action( 'tag', 'method' )`, plus hook names that type inference narrows to constant string(s) |
-| Auto-fix | yes (`phpcbf` strips the offending native types) | no (report-only; the message names the exact handler) |
+| Auto-fix | yes (`phpcbf` strips the offending native types), except `$this->add_action()` wrapper handlers, which are reported but not auto-fixed (see below) | no (report-only; the message names the exact handler) |
 
 Run both: the sniff gives instant, auto-fixable feedback for the common
 same-file case, while the PHPStan rule is the authoritative gate that catches
@@ -142,6 +142,30 @@ configuration. Enable just this sniff with:
 
 An optional `allow_void_return_on_actions` property (default `true`) controls
 whether a native `void` return type is permitted on action handlers.
+
+#### Wrapper handlers are reported but not auto-fixed
+
+Handlers registered through a `$this->add_action( 'tag', 'method' )` wrapper (for
+example memberdash's `MS_Hooker`, where the second argument names a method on the
+enclosing class and falls back to the hook name when it is absent or empty) are
+resolved with a name-match heuristic: the sniff finds the enclosing-class method
+whose name matches that argument. That heuristic is safe enough to **report** on,
+but not to **auto-fix** - in rare cases the matched method may not actually be a
+hook handler (for instance a class that defines its own unrelated
+`add_action()` / `add_filter()` method alongside a coincidentally-named method),
+and stripping native types is destructive.
+
+So for the wrapper form the sniff raises the violation without a fix: it still
+fails CI, but `phpcbf` will not touch it. Remove the native types by hand, or, if
+it is a false positive, silence it at the handler with an ignore annotation:
+
+```php
+// phpcs:ignore StellarWP.Hooks.HookHandlerTypes.NativeParameterType
+public function my_handler( int $post_id ): void {}
+```
+
+Direct callbacks (`[ $this, 'method' ]`, closures, arrow functions, same-file
+global functions) are unambiguous and remain auto-fixable as usual.
 
 ### PHPStan rule
 

@@ -487,9 +487,16 @@ class HookHandlerTypesRule implements Rule {
 				$hook,
 				$return_type
 			);
-		} else {
+		} elseif ( $this->allow_void_return_on_actions ) {
 			$message = sprintf(
 				'Handler %sfor action "%s" must not declare a native return type ("%s") other than void.',
+				$where,
+				$hook,
+				$return_type
+			);
+		} else {
+			$message = sprintf(
+				'Handler %sfor action "%s" must not declare a native return type ("%s").',
 				$where,
 				$hook,
 				$return_type

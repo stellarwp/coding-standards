@@ -134,7 +134,8 @@ class HookHandlerTypesSniff implements Sniff {
 			return;
 		}
 
-		// Argument 1: the hook name (used only to name the hook in the message).
+		// Argument 1: the hook name. Used to name the hook in the message, and on
+		// the wrapper path it also serves as the fallback handler method name.
 		$hook_name = $this->get_string_argument( $phpcs_file, $args[0] );
 		if ( $hook_name === null ) {
 			if ( $this->warn_on_dynamic_hook_names ) {
@@ -164,7 +165,11 @@ class HookHandlerTypesSniff implements Sniff {
 			return;
 		}
 
-		$this->check_handler_types( $phpcs_file, $func_ptr, $hook_name, $is_filter );
+		// Wrapper handlers ($this->add_action( 'tag', 'method' )) are resolved via
+		// a name-match heuristic, so they are reported but never auto-fixed -
+		// stripping types off a coincidental match would be destructive. Direct
+		// callbacks are unambiguous and stay auto-fixable.
+		$this->check_handler_types( $phpcs_file, $func_ptr, $hook_name, $is_filter, ! $is_wrapper );
 	}
 
 	/**
@@ -566,17 +571,19 @@ class HookHandlerTypesSniff implements Sniff {
 	}
 
 	/**
-	 * Checks a resolved handler for disallowed native parameter and return types
-	 * and fixes them by stripping only the offending type declarations.
+	 * Checks a resolved handler for disallowed native parameter and return types.
+	 * When $fixable is true the offending type declarations are stripped in place;
+	 * otherwise the violation is reported without an auto-fix.
 	 *
 	 * @param File   $phpcs_file The file being scanned.
 	 * @param int    $func_ptr   The function/closure/arrow token position.
 	 * @param string $hook_name  The resolved hook name (for messaging).
 	 * @param bool   $is_filter  Whether the hook is a filter.
+	 * @param bool   $fixable    Whether the violation may be auto-fixed.
 	 *
 	 * @return void
 	 */
-	private function check_handler_types( File $phpcs_file, int $func_ptr, string $hook_name, bool $is_filter ): void {
+	private function check_handler_types( File $phpcs_file, int $func_ptr, string $hook_name, bool $is_filter, bool $fixable = true ): void {
 		$hook_type = $is_filter ? 'filter' : 'action';
 		$params    = $phpcs_file->getMethodParameters( $func_ptr );
 
@@ -585,12 +592,15 @@ class HookHandlerTypesSniff implements Sniff {
 				continue;
 			}
 
-			$fix = $phpcs_file->addFixableError(
-				'Handler for %s "%s" must not declare the native type "%s" on parameter %s; hook arguments are not type-guaranteed (a hook can be dispatched with unexpected types, including null), so a native type can cause a fatal error.',
-				$param['type_hint_token'],
-				'NativeParameterType',
-				[ $hook_type, $hook_name, $param['type_hint'], $param['name'] ]
-			);
+			$message = 'Handler for %s "%s" must not declare the native type "%s" on parameter %s; hook arguments are not type-guaranteed (a hook can be dispatched with unexpected types, including null), so a native type can cause a fatal error.';
+			$data    = [ $hook_type, $hook_name, $param['type_hint'], $param['name'] ];
+
+			if ( ! $fixable ) {
+				$phpcs_file->addError( $message, $param['type_hint_token'], 'NativeParameterType', $data );
+				continue;
+			}
+
+			$fix = $phpcs_file->addFixableError( $message, $param['type_hint_token'], 'NativeParameterType', $data );
 
 			if ( $fix === true ) {
 				$this->remove_parameter_type( $phpcs_file, $param );
@@ -612,16 +622,21 @@ class HookHandlerTypesSniff implements Sniff {
 
 		if ( $is_filter ) {
 			$message = 'Handler for filter "%s" must not declare a native return type ("%s"); filter return values are not type-guaranteed and a native return type can cause a fatal error.';
-		} else {
+		} elseif ( $this->allow_void_return_on_actions ) {
 			$message = 'Handler for action "%s" must not declare a native return type ("%s") other than void.';
+		} else {
+			$message = 'Handler for action "%s" must not declare a native return type ("%s").';
 		}
 
-		$fix = $phpcs_file->addFixableError(
-			$message,
-			$props['return_type_token'],
-			'NativeReturnType',
-			[ $hook_name, $return_type ]
-		);
+		$data = [ $hook_name, $return_type ];
+
+		if ( ! $fixable ) {
+			$phpcs_file->addError( $message, $props['return_type_token'], 'NativeReturnType', $data );
+
+			return;
+		}
+
+		$fix = $phpcs_file->addFixableError( $message, $props['return_type_token'], 'NativeReturnType', $data );
 
 		if ( $fix === true ) {
 			$this->remove_return_type( $phpcs_file, $func_ptr, $props );

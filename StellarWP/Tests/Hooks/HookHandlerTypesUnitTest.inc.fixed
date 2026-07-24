@@ -65,9 +65,9 @@ class Example {
 		return $title;
 	}
 
-	public function wrapper_action( $id ): void {}
+	public function wrapper_action( int $id ): void {}
 
-	public function wrapper_filter( $title ) {
+	public function wrapper_filter( string $title ): string {
 		return $title;
 	}
 }
