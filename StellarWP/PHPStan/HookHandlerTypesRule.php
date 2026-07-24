@@ -43,10 +43,13 @@ use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\ParametersAcceptorWithPhpDocs;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
+use ReflectionNamedType;
+use ReflectionType;
 
 /**
  * @implements Rule<CallLike>
@@ -74,12 +77,22 @@ class HookHandlerTypesRule implements Rule {
 		$this->allow_void_return_on_actions = $allow_void_return_on_actions;
 	}
 
+	/**
+	 * The node type this rule listens for.
+	 *
+	 * @return string
+	 */
 	public function getNodeType(): string {
 		return CallLike::class;
 	}
 
 	/**
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * Dispatches a call node to the WordPress-call or wrapper-call handler.
+	 *
+	 * @param Node  $node  The call node being analysed.
+	 * @param Scope $scope The current analysis scope.
+	 *
+	 * @return array<int, RuleError>
 	 */
 	public function processNode( Node $node, Scope $scope ): array {
 		// WordPress add_action()/add_filter() calls.
@@ -101,7 +114,10 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Handles a WordPress add_action()/add_filter() function call.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @param FuncCall $node  The function-call node.
+	 * @param Scope    $scope The current analysis scope.
+	 *
+	 * @return array<int, RuleError>
 	 */
 	private function process_wp_call( FuncCall $node, Scope $scope ): array {
 		if ( ! $node->name instanceof Name ) {
@@ -137,7 +153,10 @@ class HookHandlerTypesRule implements Rule {
 	 * name). Only acts when that method actually exists on the receiver, so an
 	 * unrelated method named add_action()/add_filter() is ignored.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @param MethodCall $node  The method-call node.
+	 * @param Scope      $scope The current analysis scope.
+	 *
+	 * @return array<int, RuleError>
 	 */
 	private function process_wrapper_call( MethodCall $node, Scope $scope ): array {
 		if ( ! $node->name instanceof Node\Identifier ) {
@@ -199,7 +218,12 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Dispatches to the appropriate resolver for the callback expression.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @param Node   $callback  The callback argument node.
+	 * @param Scope  $scope     The current analysis scope.
+	 * @param string $hook      The resolved hook name.
+	 * @param bool   $is_filter Whether the hook is a filter.
+	 *
+	 * @return array<int, RuleError>
 	 */
 	private function check_callback( Node $callback, Scope $scope, string $hook, bool $is_filter ): array {
 		if ( $callback instanceof Closure || $callback instanceof ArrowFunction ) {
@@ -241,9 +265,12 @@ class HookHandlerTypesRule implements Rule {
 	 * acts when the arguments actually resolve to a real class method, so an
 	 * unrelated `->callback()` is harmlessly ignored.
 	 *
-	 * @param MethodCall|StaticCall $callback
+	 * @param MethodCall|StaticCall $callback  The container `callback()` call node.
+	 * @param Scope                 $scope     The current analysis scope.
+	 * @param string                $hook      The resolved hook name.
+	 * @param bool                  $is_filter Whether the hook is a filter.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @return array<int, RuleError>
 	 */
 	private function check_container_callback( Node $callback, Scope $scope, string $hook, bool $is_filter ): array {
 		$args = $callback->getArgs();
@@ -277,9 +304,11 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Checks an inline closure or arrow function using its declared native types.
 	 *
-	 * @param Closure|ArrowFunction $node
+	 * @param Closure|ArrowFunction $node      The closure or arrow-function node.
+	 * @param string                $hook      The resolved hook name.
+	 * @param bool                  $is_filter Whether the hook is a filter.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @return array<int, RuleError>
 	 */
 	private function check_closure_node( Node $node, string $hook, bool $is_filter ): array {
 		$errors = [];
@@ -309,7 +338,12 @@ class HookHandlerTypesRule implements Rule {
 	 * Resolves an array callback ([ $this, 'method' ], [ Foo::class, 'method' ],
 	 * [ 'Foo', 'method' ]) to the handler class(es) and checks the method.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @param Array_ $callback  The array-callback node.
+	 * @param Scope  $scope     The current analysis scope.
+	 * @param string $hook      The resolved hook name.
+	 * @param bool   $is_filter Whether the hook is a filter.
+	 *
+	 * @return array<int, RuleError>
 	 */
 	private function check_array_callback( Array_ $callback, Scope $scope, string $hook, bool $is_filter ): array {
 		if ( count( $callback->items ) < 2 || $callback->items[0] === null || $callback->items[1] === null ) {
@@ -346,7 +380,13 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Checks a resolved class method's native parameter and return types.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @param string $class_name The handler class name.
+	 * @param string $method     The handler method name.
+	 * @param string $hook       The resolved hook name.
+	 * @param bool   $is_filter  Whether the hook is a filter.
+	 * @param int    $line       The line to report the violation on.
+	 *
+	 * @return array<int, RuleError>
 	 */
 	private function check_class_method( string $class_name, string $method, string $hook, bool $is_filter, int $line ): array {
 		$class_name = ltrim( $class_name, '\\' );
@@ -394,7 +434,13 @@ class HookHandlerTypesRule implements Rule {
 	 * Checks a global-function-name callback ('my_function') using PHPStan's
 	 * static reflection, which knows project functions without loading them.
 	 *
-	 * @return array<int, \PHPStan\Rules\RuleError>
+	 * @param string $name      The global function name.
+	 * @param Scope  $scope     The current analysis scope.
+	 * @param string $hook      The resolved hook name.
+	 * @param bool   $is_filter Whether the hook is a filter.
+	 * @param int    $line      The line to report the violation on.
+	 *
+	 * @return array<int, RuleError>
 	 */
 	private function check_global_function( string $name, Scope $scope, string $hook, bool $is_filter, int $line ): array {
 		$function_name = new Name( ltrim( $name, '\\' ) );
@@ -444,7 +490,11 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Whether a native type is actually declared. An undeclared type is an
 	 * implicit `mixed`; an explicit `mixed` counts as a declared native type,
-	 * matching \ReflectionParameter::hasType() semantics used for methods.
+	 * matching ReflectionParameter::hasType() semantics used for methods.
+	 *
+	 * @param Type $type The native type to inspect.
+	 *
+	 * @return bool
 	 */
 	private function has_native_type( Type $type ): bool {
 		return ! ( $type instanceof MixedType && ! $type->isExplicitMixed() );
@@ -453,9 +503,16 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Builds a parameter-type violation error.
 	 *
-	 * @return \PHPStan\Rules\RuleError
+	 * @param bool   $is_filter  Whether the hook is a filter.
+	 * @param string $handler    The handler label (e.g. `Foo::bar()`), or '' for closures.
+	 * @param string $hook       The resolved hook name.
+	 * @param string $type       The offending native type.
+	 * @param string $param_name The parameter name, or '' when unknown.
+	 * @param int    $line       The line to report the violation on.
+	 *
+	 * @return RuleError
 	 */
-	private function param_error( bool $is_filter, string $handler, string $hook, string $type, string $param_name, int $line ) {
+	private function param_error( bool $is_filter, string $handler, string $hook, string $type, string $param_name, int $line ): RuleError {
 		$where     = $handler === '' ? '' : $handler . ' ';
 		$subject   = $param_name === '' ? 'a parameter' : 'parameter $' . $param_name;
 		$hook_type = $is_filter ? 'filter' : 'action';
@@ -475,9 +532,15 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Builds a return-type violation error.
 	 *
-	 * @return \PHPStan\Rules\RuleError
+	 * @param string $hook        The resolved hook name.
+	 * @param bool   $is_filter   Whether the hook is a filter.
+	 * @param string $return_type The offending native return type.
+	 * @param int    $line        The line to report the violation on.
+	 * @param string $handler     The handler label (e.g. `Foo::bar()`), or '' for closures.
+	 *
+	 * @return RuleError
 	 */
-	private function return_type_error( string $hook, bool $is_filter, string $return_type, int $line, string $handler = '' ) {
+	private function return_type_error( string $hook, bool $is_filter, string $return_type, int $line, string $handler = '' ): RuleError {
 		$where = $handler === '' ? '' : $handler . ' ';
 
 		if ( $is_filter ) {
@@ -508,6 +571,11 @@ class HookHandlerTypesRule implements Rule {
 
 	/**
 	 * Whether a native `void` return type is acceptable in this context.
+	 *
+	 * @param bool   $is_filter   Whether the hook is a filter.
+	 * @param string $return_type The declared native return type.
+	 *
+	 * @return bool
 	 */
 	private function is_void_allowed( bool $is_filter, string $return_type ): bool {
 		return ! $is_filter
@@ -520,6 +588,8 @@ class HookHandlerTypesRule implements Rule {
 	 * detection).
 	 *
 	 * @param Node $type A parameter or return type node.
+	 *
+	 * @return string
 	 */
 	private function type_node_to_string( Node $type ): string {
 		if ( $type instanceof Node\Identifier || $type instanceof Node\Name ) {
@@ -547,10 +617,12 @@ class HookHandlerTypesRule implements Rule {
 	/**
 	 * Renders a native ReflectionType to a readable string.
 	 *
-	 * @param \ReflectionType|null $type The reflection type.
+	 * @param ReflectionType|null $type The reflection type.
+	 *
+	 * @return string
 	 */
-	private function reflection_type_to_string( ?\ReflectionType $type ): string {
-		if ( $type instanceof \ReflectionNamedType ) {
+	private function reflection_type_to_string( ?ReflectionType $type ): string {
+		if ( $type instanceof ReflectionNamedType ) {
 			return ( $type->allowsNull() && strtolower( $type->getName() ) !== 'null' ? '?' : '' ) . $type->getName();
 		}
 

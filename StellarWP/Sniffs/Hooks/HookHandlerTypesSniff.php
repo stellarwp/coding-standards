@@ -77,14 +77,16 @@ class HookHandlerTypesSniff implements Sniff {
 	/**
 	 * Processes this test, when one of its tokens is encountered.
 	 *
+	 * $stack_ptr carries no native type hint on purpose: the PHP_CodeSniffer
+	 * Sniff interface declares process() with an untyped second parameter, and
+	 * PHP would fatal on an incompatible declaration if a type were added here.
+	 *
 	 * @param File $phpcs_file The file being scanned.
 	 * @param int  $stack_ptr  The position of the current token in the stack.
 	 *
 	 * @return void
-	 *
-	 * @phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
 	 */
-	public function process( File $phpcs_file, $stack_ptr ): void {
+	public function process( File $phpcs_file, $stack_ptr ): void { // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint -- The Sniff interface forbids a native type on this parameter; see the note above.
 		$tokens  = $phpcs_file->getTokens();
 		$content = strtolower( $tokens[ $stack_ptr ]['content'] );
 
