@@ -1,0 +1,51 @@
+# Continuous Integration for stellarwp/coding-standards.
+#
+# Exercises the standard's tests on every push to main and every pull request:
+# validates composer.json, confirms the StellarWP ruleset loads, and runs the
+# PHPUnit suite (the HookHandlerTypes sniff and PHPStan rule tests).
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    name: Test (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # PHPUnit 9.6 and PHPStan 1.x support this range. The PHPStan rule test
+        # skips on 7.4 (a php-parser emulation quirk in the test harness only);
+        # the sniff test runs on every version.
+        php-version:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+          - '8.2'
+          - '8.3'
+          - '8.4'
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Configure PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --no-check-lock
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Run tests (ruleset explain + PHPUnit)
+        run: composer test
