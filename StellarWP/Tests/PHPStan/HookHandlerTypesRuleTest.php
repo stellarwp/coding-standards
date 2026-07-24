@@ -81,6 +81,10 @@ class HookHandlerTypesRuleTest extends RuleTestCase {
 				// Non-literal hook name resolved by inference.
 				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare the native type "string" on parameter $content; ' . $param, 43 ],
 				[ 'Handler Hook_Test_Handlers::filter_method() for filter "the_content" must not declare a native return type ("string"); ' . $return, 43 ],
+
+				// Container callback: $container->callback( Class::class, 'method' ).
+				[ 'Handler Hook_Test_Handlers::container_handler() for filter "render_block" must not declare the native type "int" on parameter $value; ' . $param, 48 ],
+				[ 'Handler Hook_Test_Handlers::container_handler() for filter "render_block" must not declare a native return type ("int"); ' . $return, 48 ],
 			]
 		);
 	}

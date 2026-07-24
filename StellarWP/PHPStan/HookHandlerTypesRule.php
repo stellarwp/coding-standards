@@ -16,8 +16,9 @@
  * entire codebase (never diff-limited) and resolves callbacks and hook names
  * across files, it catches the cases the sniff cannot: a handler whose
  * declaration lives in a different file from the add_action()/add_filter() call,
- * and hook names that are not literal strings but which type inference can narrow
- * to constant string(s).
+ * hook names that are not literal strings but which type inference can narrow to
+ * constant string(s), and container callbacks
+ * (`$container->callback( Class::class, 'method' )`).
  *
  * @package StellarWP\CodingStandards
  */
@@ -29,6 +30,8 @@ use PhpParser\Node\Expr\ArrowFunction;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
@@ -127,8 +130,58 @@ class HookHandlerTypesRule implements Rule {
 			return $this->check_global_function( $callback->value, $scope, $hook, $is_filter, $callback->getStartLine() );
 		}
 
+		// Container callback: `$container->callback( Some_Class::class, 'method' )`
+		// (lucatume/di52 and StellarWP containers), which returns a callable that
+		// invokes Some_Class::method.
+		if (
+			( $callback instanceof MethodCall || $callback instanceof StaticCall )
+			&& $callback->name instanceof Node\Identifier
+			&& strtolower( $callback->name->name ) === 'callback'
+		) {
+			return $this->check_container_callback( $callback, $scope, $hook, $is_filter );
+		}
+
 		// Unresolvable callbacks (variables, first-class callables) are skipped.
 		return [];
+	}
+
+	/**
+	 * Checks a container callback - `$container->callback( Class::class, 'method' )`
+	 * - by resolving the class/method arguments and inspecting that method. Only
+	 * acts when the arguments actually resolve to a real class method, so an
+	 * unrelated `->callback()` is harmlessly ignored.
+	 *
+	 * @param MethodCall|StaticCall $callback
+	 *
+	 * @return array<int, \PHPStan\Rules\RuleError>
+	 */
+	private function check_container_callback( Node $callback, Scope $scope, string $hook, bool $is_filter ): array {
+		$args = $callback->getArgs();
+		if ( count( $args ) < 2 ) {
+			return [];
+		}
+
+		$class_type = $scope->getType( $args[0]->value );
+
+		$class_names = [];
+		foreach ( $class_type->getObjectClassReflections() as $class_reflection ) {
+			$class_names[ $class_reflection->getName() ] = true;
+		}
+		foreach ( $class_type->getConstantStrings() as $constant_string ) {
+			$class_names[ $constant_string->getValue() ] = true;
+		}
+
+		$errors = [];
+		foreach ( $scope->getType( $args[1]->value )->getConstantStrings() as $method_string ) {
+			foreach ( array_keys( $class_names ) as $class_name ) {
+				$errors = array_merge(
+					$errors,
+					$this->check_class_method( $class_name, $method_string->getValue(), $hook, $is_filter, $callback->getStartLine() )
+				);
+			}
+		}
+
+		return $errors;
 	}
 
 	/**

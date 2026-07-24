@@ -42,5 +42,10 @@ add_filter( 'get_the_excerpt', 'typeless_global_filter' );
 $hook = 'the_content';
 add_filter( $hook, [ $obj, 'filter_method' ] );
 
+// Container callback ($container->callback( Class::class, 'method' )): resolves
+// to the target method - param + return.
+$container = new Fake_Container();
+add_filter( 'render_block', $container->callback( Hook_Test_Handlers::class, 'container_handler' ) );
+
 // Unknown/undefined global function - skipped.
 add_filter( 'wp_footer', 'some_undefined_handler' );

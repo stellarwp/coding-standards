@@ -28,6 +28,17 @@ class Hook_Test_Handlers {
 	public static function static_filter( string $title ): string {
 		return $title;
 	}
+
+	public function container_handler( int $value ): int {
+		return $value;
+	}
+}
+
+class Fake_Container {
+
+	public function callback( $id, $method ) {
+		return static function () {};
+	}
 }
 
 function global_filter( string $length ): string {
