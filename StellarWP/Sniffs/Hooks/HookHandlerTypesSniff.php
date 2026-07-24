@@ -14,13 +14,15 @@
  * - Action handlers: no native type on ANY parameter; a native `void` return
  *   type is allowed (actions always return void).
  *
- * This sniff analyses at the call site (add_action()/add_filter()) and can only
- * resolve handlers that live in the same file: inline closures and arrow
- * functions, same-file [ $this, 'method' ] / [ self::class, 'method' ] references,
- * and same-file 'function_name' global-function handlers. It also only understands
- * literal hook names. Cross-file callbacks and non-literal hook names are left to
- * the companion PHPStan rule, which resolves callbacks across files via reflection
- * and resolves hook names via type inference (constant-string types).
+ * This sniff analyses at the call site and can only resolve handlers that live in
+ * the same file: inline closures and arrow functions, same-file [ $this, 'method' ]
+ * / [ self::class, 'method' ] references, same-file 'function_name' global-function
+ * handlers, and $this->add_action( 'tag', 'method' ) wrapper calls whose handler
+ * method is on the enclosing class (e.g. memberdash's MS_Hooker). It also only
+ * understands literal hook names. Cross-file callbacks and non-literal hook names
+ * are left to the companion PHPStan rule, which resolves callbacks across files
+ * via reflection and resolves hook names via type inference (constant-string
+ * types).
  *
  * @package StellarWP\CodingStandards
  */
@@ -90,18 +92,28 @@ class HookHandlerTypesSniff implements Sniff {
 			return;
 		}
 
-		// Ensure this is a direct function call, not a method call or a definition.
-		$prev = $phpcs_file->findPrevious( Tokens::$emptyTokens, $stack_ptr - 1, null, true );
-		if ( $prev !== false ) {
-			$skip_before = [
-				T_OBJECT_OPERATOR,
-				T_NULLSAFE_OBJECT_OPERATOR,
-				T_DOUBLE_COLON,
-				T_FUNCTION,
-				T_NEW,
-			];
+		// Determine the call form. A global add_action()/add_filter() call takes a
+		// callback as its second argument. A $this->add_action( 'tag', 'method' )
+		// wrapper (e.g. memberdash's MS_Hooker) takes a method name that resolves
+		// to a method on the enclosing class. Other forms (another object, ::, or a
+		// definition) are not handled here.
+		$prev       = $phpcs_file->findPrevious( Tokens::$emptyTokens, $stack_ptr - 1, null, true );
+		$is_wrapper = false;
 
-			if ( in_array( $tokens[ $prev ]['code'], $skip_before, true ) ) {
+		if ( $prev !== false ) {
+			if ( in_array( $tokens[ $prev ]['code'], [ T_OBJECT_OPERATOR, T_NULLSAFE_OBJECT_OPERATOR ], true ) ) {
+				// Only $this-> wrappers can be resolved (and fixed) within this file.
+				$receiver = $phpcs_file->findPrevious( Tokens::$emptyTokens, $prev - 1, null, true );
+				if (
+					$receiver === false
+					|| $tokens[ $receiver ]['code'] !== T_VARIABLE
+					|| strtolower( $tokens[ $receiver ]['content'] ) !== '$this'
+				) {
+					return;
+				}
+
+				$is_wrapper = true;
+			} elseif ( in_array( $tokens[ $prev ]['code'], [ T_DOUBLE_COLON, T_FUNCTION, T_NEW ], true ) ) {
 				return;
 			}
 		}
@@ -116,9 +128,9 @@ class HookHandlerTypesSniff implements Sniff {
 		}
 
 		$close_paren = $tokens[ $open_paren ]['parenthesis_closer'];
+		$args        = $this->split_arguments( $phpcs_file, $open_paren, $close_paren );
 
-		$args = $this->split_arguments( $phpcs_file, $open_paren, $close_paren );
-		if ( count( $args ) < 2 ) {
+		if ( $args === [] ) {
 			return;
 		}
 
@@ -138,14 +150,52 @@ class HookHandlerTypesSniff implements Sniff {
 
 		$is_filter = self::HOOK_FUNCTIONS[ $content ];
 
-		// Argument 2: the callback. Resolve to a function/closure/method token.
-		$func_ptr = $this->resolve_handler( $phpcs_file, $args[1], $stack_ptr );
+		if ( $is_wrapper ) {
+			$func_ptr = $this->resolve_wrapper_handler( $phpcs_file, $args, $hook_name, $stack_ptr );
+		} elseif ( isset( $args[1] ) ) {
+			// Argument 2: the callback. Resolve to a function/closure/method token.
+			$func_ptr = $this->resolve_handler( $phpcs_file, $args[1], $stack_ptr );
+		} else {
+			return;
+		}
+
 		if ( $func_ptr === null ) {
-			// Cross-file, global-function, or dynamic callback: left to the PHPStan rule.
+			// Cross-file, global-function, or dynamic handler: left to the PHPStan rule.
 			return;
 		}
 
 		$this->check_handler_types( $phpcs_file, $func_ptr, $hook_name, $is_filter );
+	}
+
+	/**
+	 * Resolves the handler method for a $this->add_action( 'tag', 'method' )
+	 * wrapper call. The method name is the second argument, falling back to the
+	 * hook name when it is absent or an empty string (per MS_Hooker). Returns the
+	 * method token in the enclosing class, or null when it cannot be resolved.
+	 *
+	 * @param File                                     $phpcs_file The file being scanned.
+	 * @param array<int, array{start: int, end: int}>  $args       The call arguments.
+	 * @param string                                   $hook_name  The resolved hook name.
+	 * @param int                                      $stack_ptr  The call token position.
+	 *
+	 * @return int|null
+	 */
+	private function resolve_wrapper_handler( File $phpcs_file, array $args, string $hook_name, int $stack_ptr ): ?int {
+		$method = $hook_name;
+
+		if ( isset( $args[1] ) ) {
+			$argument = $this->get_string_argument( $phpcs_file, $args[1] );
+			if ( $argument === null ) {
+				// Dynamic method name - cannot be resolved within this file.
+				return null;
+			}
+
+			if ( $argument !== '' ) {
+				$method = $argument;
+			}
+		}
+
+		return $this->find_class_method( $phpcs_file, $stack_ptr, $method );
 	}
 
 	/**

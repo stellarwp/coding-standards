@@ -41,6 +41,10 @@ class Example {
 
 		// Cross-file callback - left to the PHPStan rule.
 		add_filter( 'get_the_excerpt', 'some_cross_file_handler' );
+
+		// Wrapper method calls on $this: the handler is a method on this class.
+		$this->add_action( 'save_post', 'wrapper_action' );
+		$this->add_filter( 'the_title', 'wrapper_filter' );
 	}
 
 	public function filter_method( string $content ): string {
@@ -58,6 +62,12 @@ class Example {
 	public function ref_action( \WP_Error $error ) {}
 
 	public static function static_filter( string $title ): string {
+		return $title;
+	}
+
+	public function wrapper_action( int $id ): void {}
+
+	public function wrapper_filter( string $title ): string {
 		return $title;
 	}
 }

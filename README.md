@@ -123,7 +123,7 @@ public function filter_the_value( $value, $post_id ) {
 | | PHPCS sniff (`StellarWP.Hooks.HookHandlerTypes`) | PHPStan rule |
 |---|---|---|
 | Runs in | phpcs (fast, in-editor) | phpstan (whole codebase, never diff-limited) |
-| Covers | same-file handlers only (inline closures/arrows, `[ $this, 'method' ]` / `[ self::class, 'method' ]`, and `'function_name'`) with literal hook names | all callback forms across files (via reflection), including `$container->callback( Class::class, 'method' )` and wrapper methods like `$this->add_action( 'tag', 'method' )`, plus hook names that type inference narrows to constant string(s) |
+| Covers | same-file handlers only (inline closures/arrows, `[ $this, 'method' ]` / `[ self::class, 'method' ]`, `'function_name'`, and `$this->add_action( 'tag', 'method' )` wrappers) with literal hook names | all callback forms across files (via reflection), including `$container->callback( Class::class, 'method' )` and wrapper methods like `$this->add_action( 'tag', 'method' )`, plus hook names that type inference narrows to constant string(s) |
 | Auto-fix | yes (`phpcbf` strips the offending native types) | no (report-only; the message names the exact handler) |
 
 Run both: the sniff gives instant, auto-fixable feedback for the common
