@@ -1,14 +1,25 @@
 <?php
 /**
- * PHPStan rule: forbids native parameter and return types on handlers attached
- * to hooks that this project does not own.
+ * PHPStan rule: forbids native parameter and return types on hook handlers where
+ * the argument or return types are not guaranteed. Enforcement mirrors the
+ * StellarWP.Hooks.HookHandlerTypes sniff:
  *
- * This is the whole-codebase companion to the StellarWP.Hooks.HookHandlerTypes
- * PHPCS sniff. Because PHPStan analyses the entire codebase (never diff-limited)
- * and resolves callbacks and hook names across files, it catches the cases the
- * sniff cannot: a handler method whose declaration lives in a different file
- * from the add_action()/add_filter() call, and hook names that are not literal
- * strings but which type inference can narrow to constant string(s).
+ * - Filters (any prefix): the handler must be fully type-less - no native type
+ *   on any parameter and no native return type. A filter can be dispatched with
+ *   arguments of unexpected types even by first-party code (e.g. core calls
+ *   apply_filters( 'sfwd_lms_has_access', true, 28, null ), so a native
+ *   `int $user_id` fatals), and its return value flows through code we do not
+ *   control.
+ * - Non-first-party actions (WP core / third-party): no native parameter types;
+ *   a void return type is allowed.
+ * - First-party actions: unrestricted.
+ *
+ * This is the whole-codebase companion to the sniff. Because PHPStan analyses the
+ * entire codebase (never diff-limited) and resolves callbacks and hook names
+ * across files, it catches the cases the sniff cannot: a handler whose
+ * declaration lives in a different file from the add_action()/add_filter() call,
+ * and hook names that are not literal strings but which type inference can narrow
+ * to constant string(s).
  *
  * @package StellarWP\CodingStandards
  */
@@ -100,20 +111,27 @@ class HookHandlerTypesRule implements Rule {
 			return [];
 		}
 
-		$foreign_hook = null;
+		$is_filter = $function === 'add_filter';
+
+		$hook            = $constant_strings[0]->getValue();
+		$all_first_party = true;
 		foreach ( $constant_strings as $constant_string ) {
 			if ( ! $this->is_first_party( $constant_string->getValue() ) ) {
-				$foreign_hook = $constant_string->getValue();
+				$hook            = $constant_string->getValue();
+				$all_first_party = false;
 				break;
 			}
 		}
 
-		// Every possible hook name is first-party: nothing to enforce.
-		if ( $foreign_hook === null ) {
+		// First-party actions are unrestricted. Everything else is checked: any
+		// filter (a first-party filter still cannot type its arguments or return -
+		// the value is shaped by other code, and even core dispatches unexpected
+		// types), and non-first-party actions.
+		if ( $all_first_party && ! $is_filter ) {
 			return [];
 		}
 
-		return $this->check_callback( $args[1]->value, $scope, $foreign_hook, $function === 'add_filter' );
+		return $this->check_callback( $args[1]->value, $scope, $hook, $is_filter );
 	}
 
 	/**
@@ -159,18 +177,9 @@ class HookHandlerTypesRule implements Rule {
 				continue;
 			}
 
-			$subject = $param->var instanceof Node\Expr\Variable && is_string( $param->var->name )
-				? 'parameter $' . $param->var->name
-				: 'a parameter';
+			$name = $param->var instanceof Node\Expr\Variable && is_string( $param->var->name ) ? $param->var->name : '';
 
-			$errors[] = RuleErrorBuilder::message(
-				sprintf(
-					'Handler for non-first-party hook "%s" must not declare the native type "%s" on %s; WordPress does not guarantee hook argument types and a native type can cause a fatal error.',
-					$hook,
-					$this->type_node_to_string( $param->type ),
-					$subject
-				)
-			)->identifier( 'stellarwp.hookHandlerParamType' )->line( $param->getStartLine() )->build();
+			$errors[] = $this->param_error( $is_filter, '', $hook, $this->type_node_to_string( $param->type ), $name, $param->getStartLine() );
 		}
 
 		if ( $node->returnType !== null ) {
@@ -248,16 +257,14 @@ class HookHandlerTypesRule implements Rule {
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(
-				sprintf(
-					'Handler %s::%s() for non-first-party hook "%s" must not declare the native type "%s" on parameter $%s; WordPress does not guarantee hook argument types and a native type can cause a fatal error.',
-					$declaring,
-					$method,
-					$hook,
-					$this->reflection_type_to_string( $parameter->getType() ),
-					$parameter->getName()
-				)
-			)->identifier( 'stellarwp.hookHandlerParamType' )->line( $line )->build();
+			$errors[] = $this->param_error(
+				$is_filter,
+				$declaring . '::' . $method . '()',
+				$hook,
+				$this->reflection_type_to_string( $parameter->getType() ),
+				$parameter->getName(),
+				$line
+			);
 		}
 
 		if ( $reflection_method->hasReturnType() ) {
@@ -299,15 +306,14 @@ class HookHandlerTypesRule implements Rule {
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(
-				sprintf(
-					'Handler %s() for non-first-party hook "%s" must not declare the native type "%s" on parameter $%s; WordPress does not guarantee hook argument types and a native type can cause a fatal error.',
-					$name,
-					$hook,
-					$parameter->getNativeType()->describe( VerbosityLevel::typeOnly() ),
-					$parameter->getName()
-				)
-			)->identifier( 'stellarwp.hookHandlerParamType' )->line( $line )->build();
+			$errors[] = $this->param_error(
+				$is_filter,
+				$name . '()',
+				$hook,
+				$parameter->getNativeType()->describe( VerbosityLevel::typeOnly() ),
+				$parameter->getName(),
+				$line
+			);
 		}
 
 		$native_return = $variant->getNativeReturnType();
@@ -333,6 +339,36 @@ class HookHandlerTypesRule implements Rule {
 	}
 
 	/**
+	 * Builds a parameter-type violation error.
+	 *
+	 * @return \PHPStan\Rules\RuleError
+	 */
+	private function param_error( bool $is_filter, string $handler, string $hook, string $type, string $param_name, int $line ) {
+		$where   = $handler === '' ? '' : $handler . ' ';
+		$subject = $param_name === '' ? 'a parameter' : 'parameter $' . $param_name;
+
+		if ( $is_filter ) {
+			$message = sprintf(
+				'Handler %sfor filter "%s" must not declare the native type "%s" on %s; a filter can be dispatched with arguments of unexpected types (including null), so a native type can cause a fatal error.',
+				$where,
+				$hook,
+				$type,
+				$subject
+			);
+		} else {
+			$message = sprintf(
+				'Handler %sfor non-first-party action "%s" must not declare the native type "%s" on %s; WordPress does not guarantee hook argument types and a native type can cause a fatal error.',
+				$where,
+				$hook,
+				$type,
+				$subject
+			);
+		}
+
+		return RuleErrorBuilder::message( $message )->identifier( 'stellarwp.hookHandlerParamType' )->line( $line )->build();
+	}
+
+	/**
 	 * Builds a return-type violation error.
 	 *
 	 * @return \PHPStan\Rules\RuleError
@@ -342,7 +378,7 @@ class HookHandlerTypesRule implements Rule {
 
 		if ( $is_filter ) {
 			$message = sprintf(
-				'Handler %sfor non-first-party filter "%s" must not declare a native return type ("%s"); filter return values are not type-guaranteed and a native return type can cause a fatal error.',
+				'Handler %sfor filter "%s" must not declare a native return type ("%s"); filter return values are not type-guaranteed and a native return type can cause a fatal error.',
 				$where,
 				$hook,
 				$return_type

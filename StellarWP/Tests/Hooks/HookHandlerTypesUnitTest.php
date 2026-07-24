@@ -22,15 +22,15 @@ class HookHandlerTypesUnitTest extends AbstractSniffUnitTest {
 	 */
 	protected function getErrorList() {
 		return [
-			12 => 1, // Closure on 'init': native param type (void return is allowed).
-			15 => 2, // Closure on 'body_class': native param type + native return type.
-			48 => 3, // Closure on 'pre_get_posts': nullable, by-reference, variadic params.
-			51 => 1, // Closure on 'the_title': native param type.
-			52 => 1, // Closure on 'the_title': native return type (on its own line).
-			58 => 2, // filter_content(): param + return (via the 'the_content' binding).
-			64 => 2, // on_save(): two native param types (via the 'save_post' binding).
-			66 => 2, // static_filter(): param + return (via the 'wp_title' self::class binding).
-			71 => 2, // global_excerpt_handler(): param + return (via the same-file 'excerpt_length' binding).
+			22 => 1, // init closure (non-first-party action): param; void return allowed.
+			25 => 3, // ld_valid closure (first-party filter): two params + return.
+			30 => 3, // pre_get_posts closure (non-first-party action): nullable, by-ref, variadic.
+			49 => 2, // np_filter() (non-first-party filter): param + return.
+			53 => 2, // np_action() (non-first-party action): two params; void return allowed.
+			55 => 4, // fp_filter() (first-party filter): all three params + return.
+			61 => 1, // np_ref_action() (non-first-party action, via [ &$this, ... ]): param.
+			63 => 2, // fp_static_filter() (first-party filter, via self::class): param + return.
+			68 => 2, // np_global_filter() (non-first-party filter, global function): param + return.
 		];
 	}
 

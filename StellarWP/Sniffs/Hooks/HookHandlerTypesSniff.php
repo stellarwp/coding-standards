@@ -12,9 +12,18 @@
  * handlers.
  *
  * "First-party" is determined solely by the configured prefixes, which should
- * mirror the project's WordPress.NamingConventions.PrefixAllGlobals value. Any
- * hook whose name does not start with a configured prefix is treated as WP core
- * or third-party and its handler must be type-less.
+ * mirror the project's WordPress.NamingConventions.PrefixAllGlobals value. The
+ * enforcement follows the hook type:
+ *
+ * - Filters (any prefix, first-party or not): the handler must be fully
+ *   type-less - no native type on ANY parameter and no native return type. A
+ *   filter can be dispatched with arguments of unexpected types even by
+ *   first-party code (e.g. LearnDash core calls apply_filters( 'sfwd_lms_has_access',
+ *   true, 28, null ), so a native `int $user_id` fatals), and its return value
+ *   flows through code we do not control.
+ * - Non-first-party actions (WP core / third-party): no native parameter types;
+ *   a void return type is allowed.
+ * - First-party actions: unrestricted.
  *
  * This sniff analyses at the call site (add_action()/add_filter()) and can only
  * resolve handlers that live in the same file: inline closures and arrow
@@ -153,7 +162,13 @@ class HookHandlerTypesSniff implements Sniff {
 			return;
 		}
 
-		if ( $this->is_first_party( $hook_name ) ) {
+		$is_filter   = self::HOOK_FUNCTIONS[ $content ];
+		$first_party = $this->is_first_party( $hook_name );
+
+		// First-party actions may be typed freely. First-party filters still must
+		// have a type-less first argument and no native return type: a filter's
+		// value is shaped by other code (plugins/themes) we do not control.
+		if ( $first_party && ! $is_filter ) {
 			return;
 		}
 
@@ -164,7 +179,7 @@ class HookHandlerTypesSniff implements Sniff {
 			return;
 		}
 
-		$this->check_handler_types( $phpcs_file, $func_ptr, $hook_name, self::HOOK_FUNCTIONS[ $content ] );
+		$this->check_handler_types( $phpcs_file, $func_ptr, $hook_name, $is_filter );
 	}
 
 	/**
@@ -450,15 +465,24 @@ class HookHandlerTypesSniff implements Sniff {
 	private function is_current_class_reference( File $phpcs_file, array $element ): bool {
 		$tokens = $phpcs_file->getTokens();
 		$first  = $element['start'];
-		$code   = $tokens[ $first ]['code'];
+
+		// Skip a leading reference operator, e.g. the old `[ &$this, 'method' ]` idiom.
+		if ( $tokens[ $first ]['code'] === T_BITWISE_AND ) {
+			$first = $phpcs_file->findNext( Tokens::$emptyTokens, $first + 1, $element['end'] + 1, true );
+			if ( $first === false ) {
+				return false;
+			}
+		}
+
+		$code = $tokens[ $first ]['code'];
 
 		if ( $code === T_VARIABLE ) {
-			return $element['start'] === $element['end']
+			return $first === $element['end']
 				&& strtolower( $tokens[ $first ]['content'] ) === '$this';
 		}
 
 		if ( $code === T_CLASS_C ) {
-			return $element['start'] === $element['end'];
+			return $first === $element['end'];
 		}
 
 		// self::class / static::class. PHPCS tokenizes these as T_SELF / T_STATIC;
@@ -567,8 +591,14 @@ class HookHandlerTypesSniff implements Sniff {
 				continue;
 			}
 
+			if ( $is_filter ) {
+				$message = 'Handler for filter "%s" must not declare the native type "%s" on parameter %s; a filter can be dispatched with arguments of unexpected types (including null), so a native type can cause a fatal error.';
+			} else {
+				$message = 'Handler for non-first-party action "%s" must not declare the native type "%s" on parameter %s; WordPress does not guarantee hook argument types and a native type can cause a fatal error.';
+			}
+
 			$fix = $phpcs_file->addFixableError(
-				'Handler for non-first-party hook "%s" must not declare the native type "%s" on parameter %s; WordPress does not guarantee hook argument types and a native type can cause a fatal error.',
+				$message,
 				$param['type_hint_token'],
 				'NativeParameterType',
 				[ $hook_name, $param['type_hint'], $param['name'] ]
@@ -587,12 +617,14 @@ class HookHandlerTypesSniff implements Sniff {
 		$return_type    = $props['return_type'];
 		$return_type_lc = strtolower( ltrim( $return_type, '?\\' ) );
 
+		// Actions always return void, so a void return type is acceptable.
 		if ( ! $is_filter && $this->allow_void_return_on_actions && $return_type_lc === 'void' ) {
 			return;
 		}
 
 		if ( $is_filter ) {
-			$message = 'Handler for non-first-party filter "%s" must not declare a native return type ("%s"); filter return values are not type-guaranteed and a native return type can cause a fatal error.';
+			// Filters can never carry a native return type, first-party or not.
+			$message = 'Handler for filter "%s" must not declare a native return type ("%s"); filter return values are not type-guaranteed and a native return type can cause a fatal error.';
 		} else {
 			$message = 'Handler for non-first-party action "%s" must not declare a native return type ("%s") other than void.';
 		}

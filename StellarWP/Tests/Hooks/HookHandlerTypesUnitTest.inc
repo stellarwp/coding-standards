@@ -5,73 +5,66 @@
 class Example {
 
 	public function register() {
-		// Non-first-party filter, same-file method handler (param + return type).
-		add_filter( 'the_content', [ $this, 'filter_content' ] );
+		// Non-first-party filter: all params + return must be type-less.
+		add_filter( 'the_content', [ $this, 'np_filter' ] );
 
-		// Non-first-party action, closure with param type and void return (void ok).
+		// Non-first-party action: params must be type-less; void return is allowed.
+		add_action( 'save_post', [ $this, 'np_action' ] );
+
+		// First-party filter: all params + return must be type-less, including the
+		// context arguments (core can dispatch e.g. a null user id).
+		add_filter( 'learndash_has_access', [ $this, 'fp_filter' ] );
+
+		// First-party action: unrestricted - no errors.
+		add_action( 'learndash_after_save', [ $this, 'fp_action' ] );
+
+		// Non-first-party action, closure: param flagged, void return allowed.
 		add_action( 'init', function ( int $x ): void {} );
 
-		// Non-first-party filter, closure with a return type (not allowed).
-		add_filter( 'body_class', function ( array $classes ): array {
-			return $classes;
+		// First-party filter, closure: all params + return flagged.
+		add_filter( 'ld_valid', function ( bool $valid, int $id ): bool {
+			return $valid;
 		} );
 
-		// First-party filter (matches prefix) - no error.
-		add_filter( 'learndash_something', [ $this, 'filter_content' ] );
-
-		// First-party action - no error even with types.
-		add_action( 'ld_after_save', [ $this, 'typed_action' ] );
-
-		// Non-first-party action handler with param types (method).
-		add_action( 'save_post', [ $this, 'on_save' ] );
-
-		// Non-literal hook name - the sniff skips this (the PHPStan rule catches it).
-		$hook = 'the_content';
-		add_filter( $hook, [ $this, 'filter_content' ] );
-
-		// self::class reference to a static method.
-		add_filter( 'wp_title', [ self::class, 'static_filter' ] );
-
-		// Same-file global-function handler with types - resolved and fixed here.
-		add_filter( 'excerpt_length', 'global_excerpt_handler' );
-
-		// Same-file global-function handler that is already type-less - no error.
-		add_filter( 'get_the_excerpt', 'typeless_excerpt_handler' );
-
-		// First-party hook with a typed global handler - no error.
-		add_filter( 'learndash_excerpt', 'global_excerpt_handler' );
-
-		// Cross-file global-function handler (not defined here) - left to PHPStan.
-		add_filter( 'wp_footer', 'some_cross_file_handler' );
-
-		// Non-first-party action, nullable + by-reference + variadic params.
+		// Non-first-party action closure with nullable / by-reference / variadic.
 		add_action( 'pre_get_posts', function ( ?WP_Query $q, int &$ref, string ...$rest ) {} );
 
-		// Non-first-party filter with the return type on its own line.
-		add_filter( 'the_title', function ( \WP_Post $post )
-			: string
-		{
-			return $post->post_title;
-		} );
+		// self::class static handler on a first-party filter.
+		add_filter( 'sfwd_lms_has_access', [ self::class, 'fp_static_filter' ] );
+
+		// Old-style [ &$this, 'method' ] reference on a non-first-party action.
+		add_action( 'wp_mail_failed', [ &$this, 'np_ref_action' ] );
+
+		// Same-file global-function handler on a non-first-party filter.
+		add_filter( 'excerpt_length', 'np_global_filter' );
+
+		// Dynamic hook name - skipped by the sniff (the PHPStan rule catches it).
+		$hook = 'the_content';
+		add_filter( $hook, [ $this, 'np_filter' ] );
+
+		// Cross-file callback - left to the PHPStan rule.
+		add_filter( 'wp_title', 'some_cross_file_handler' );
 	}
 
-	public function filter_content( string $content ): string {
+	public function np_filter( string $content ): string {
 		return $content;
 	}
 
-	public function typed_action( int $id ): void {}
+	public function np_action( int $post_id, WP_Post $post ): void {}
 
-	public function on_save( int $post_id, WP_Post $post ): void {}
+	public function fp_filter( bool $has_access, int $post_id, int $user_id ): bool {
+		return $has_access;
+	}
 
-	public static function static_filter( string $title ): string {
+	public function fp_action( int $id ): void {}
+
+	public function np_ref_action( \WP_Error $error ) {}
+
+	public static function fp_static_filter( string $title ): string {
 		return $title;
 	}
 }
 
-function global_excerpt_handler( string $excerpt ): string {
-	return $excerpt;
-}
-
-function typeless_excerpt_handler( $excerpt ) {
-	return $excerpt;
+function np_global_filter( string $length ): string {
+	return $length;
 }

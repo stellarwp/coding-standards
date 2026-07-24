@@ -9,43 +9,39 @@
 
 $obj = new Hook_Test_Handlers();
 
-// Cross-file method handler (declared in handlers.php): param + return.
-add_filter( 'the_content', [ $obj, 'filter_content' ] );
+// Non-first-party filter, cross-file method: param + return.
+add_filter( 'the_content', [ $obj, 'np_filter' ] );
 
-// Cross-file action handler: two param types; void return is allowed.
-add_action( 'save_post', [ $obj, 'on_save' ] );
+// Non-first-party action, cross-file method: two params; void return allowed.
+add_action( 'save_post', [ $obj, 'np_action' ] );
 
-// String class reference to a cross-file static method: param + return.
-add_filter( 'wp_title', [ 'Hook_Test_Handlers', 'static_filter' ] );
+// First-party filter, cross-file method: all three params + return (a context
+// argument such as the user id can be dispatched as null by core).
+add_filter( 'learndash_has_access', [ $obj, 'fp_filter' ] );
 
-// First-party filter (matches prefix) - no error.
-add_filter( 'learndash_something', [ $obj, 'filter_content' ] );
+// First-party action, cross-file method: unrestricted - no error.
+add_action( 'learndash_after_save', [ $obj, 'fp_action' ] );
 
-// First-party action - no error even with types.
-add_action( 'ld_after_save', [ $obj, 'typed_ld_handler' ] );
+// First-party filter, string class reference to a static method: param + return.
+add_filter( 'sfwd_lms_has_access', [ 'Hook_Test_Handlers', 'fp_static_filter' ] );
 
-// Inline closure on a non-first-party action: param type; void return allowed.
+// Non-first-party action, closure: param; void return allowed.
 add_action( 'init', function ( int $x ): void {} );
 
-// Inline closure on a non-first-party filter: param + return type.
-add_filter( 'body_class', function ( array $classes ): array {
-	return $classes;
+// First-party filter, closure: two params + return.
+add_filter( 'ld_valid', function ( bool $valid, int $id ): bool {
+	return $valid;
 } );
 
-// Non-literal hook name that type inference narrows to 'the_content' - the case
-// the sniff cannot see. Resolves to a non-first-party hook: param + return.
+// Non-first-party filter, global function: param + return.
+add_filter( 'excerpt_length', 'np_global_filter' );
+
+// Already type-less global function - no error.
+add_filter( 'get_the_excerpt', 'typeless_global_filter' );
+
+// Non-literal hook name resolved by inference to a non-first-party filter.
 $hook = 'the_content';
-add_filter( $hook, [ $obj, 'filter_content' ] );
-
-// Global-function-name callback with native types - resolved via PHPStan's
-// static function reflection: param + return.
-add_filter( 'excerpt_length', 'typed_global_handler' );
-
-// Global-function-name callback that is already type-less - no error.
-add_filter( 'get_the_excerpt', 'typeless_global_handler' );
-
-// First-party hook with a typed global handler - no error.
-add_filter( 'learndash_excerpt', 'typed_global_handler' );
+add_filter( $hook, [ $obj, 'np_filter' ] );
 
 // Unknown/undefined global function - skipped.
 add_filter( 'wp_footer', 'some_undefined_handler' );

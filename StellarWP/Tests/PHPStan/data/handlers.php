@@ -13,23 +13,27 @@ class WP_Query {}
 
 class Hook_Test_Handlers {
 
-	public function filter_content( string $content ): string {
+	public function np_filter( string $content ): string {
 		return $content;
 	}
 
-	public function on_save( int $post_id, WP_Post $post ): void {}
+	public function np_action( int $post_id, WP_Post $post ): void {}
 
-	public static function static_filter( string $title ): string {
-		return $title;
+	public function fp_filter( bool $has_access, int $post_id, int $user_id ): bool {
+		return $has_access;
 	}
 
-	public function typed_ld_handler( int $id ): void {}
+	public function fp_action( int $id ): void {}
+
+	public static function fp_static_filter( string $title ): string {
+		return $title;
+	}
 }
 
-function typed_global_handler( string $value ): string {
-	return $value;
+function np_global_filter( string $length ): string {
+	return $length;
 }
 
-function typeless_global_handler( $value ) {
-	return $value;
+function typeless_global_filter( $length ) {
+	return $length;
 }

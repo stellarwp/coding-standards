@@ -88,9 +88,18 @@ handlers.
 
 This standard enforces that rule with two complementary tools. "First-party" is
 determined solely by prefixes you configure, which should mirror your project's
-`WordPress.NamingConventions.PrefixAllGlobals` value. Any hook whose name does
-**not** start with a configured prefix is treated as WP core / third-party and its
-handler must be type-less.
+`WordPress.NamingConventions.PrefixAllGlobals` value. Enforcement follows the hook
+type:
+
+- **Filters (any prefix, first-party or not):** the handler must be fully
+  type-less - no native type on **any** parameter and no native return type. A
+  filter can be dispatched with arguments of unexpected types even by first-party
+  code (LearnDash core calls `apply_filters( 'sfwd_lms_has_access', true, 28, null )`,
+  so a native `int $user_id` throws a `TypeError`), and its return value flows
+  through code you do not control.
+- **Non-first-party actions** (WP core / third-party): no native parameter types;
+  a `void` return type is allowed.
+- **First-party actions:** unrestricted.
 
 | | PHPCS sniff (`StellarWP.Hooks.HookHandlerTypes`) | PHPStan rule |
 |---|---|---|
