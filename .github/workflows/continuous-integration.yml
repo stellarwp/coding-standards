@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Check out the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configure PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
@@ -45,7 +45,7 @@ jobs:
         run: composer validate --no-check-lock
 
       - name: Install dependencies
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@v4
 
       # Runs the sniff (AbstractSniffUnitTest) and PHPStan rule (RuleTestCase)
       # tests. The sniff test constructs the full StellarWP ruleset, so a broken
