@@ -1,0 +1,18 @@
+parameters:
+	stellarwpHookHandlerTypes:
+		# Actions always return void, so a native `void` return type is allowed on
+		# action handlers. Set to false to forbid it too.
+		allowVoidReturnOnActions: true
+
+parametersSchema:
+	stellarwpHookHandlerTypes: structure([
+		allowVoidReturnOnActions: bool()
+	])
+
+services:
+	-
+		class: StellarWP\PHPStan\HookHandlerTypesRule
+		arguments:
+			allow_void_return_on_actions: %stellarwpHookHandlerTypes.allowVoidReturnOnActions%
+		tags:
+			- phpstan.rules.rule
